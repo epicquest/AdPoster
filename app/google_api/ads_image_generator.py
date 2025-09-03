@@ -1,0 +1,81 @@
+from datetime import datetime
+from pathlib import Path
+import io
+from PIL import Image
+import google.genai as genai
+from google.genai import types
+
+from config import PLATFORM_SETTINGS
+
+class AdImageGenerator:
+    def __init__(self, api_key: str):
+        self.gemini_api_key = api_key
+        self.client = genai.Client(api_key=self.gemini_api_key)
+
+    def generate_image_from_text(
+        self,
+        platform: str,
+        prompt: str,
+        output_dir: str,
+        output_filename: str,
+    ):
+        """
+        Generate a platform-optimized advertisement image.
+
+        Args:
+            platform (str): The target platform (must exist in PLATFORM_SETTINGS).
+            prompt (str): Base description of the ad image.
+            output_dir (str): Directory to save the generated image.
+            output_filename (str, optional): Custom filename. Defaults to timestamp.
+        """
+        try:
+            # Get platform-specific settings
+            settings = PLATFORM_SETTINGS.get(platform, {})
+            aspect_ratio = settings.get("aspect_ratio", "16:9")
+            tone = settings.get("tone", "")
+            style = settings.get("style", "")
+
+            # Refine the prompt to include style & tone while avoiding text
+            refined_prompt = (
+                f"{prompt}. {style}. Tone: {tone}. "
+                f"Highly detailed, professional advertisement-style, "
+                f"modern design, no words, no text, no labels."
+            )
+
+            # Create output directory
+            output_dir = Path(output_dir)
+            output_dir.mkdir(parents=True, exist_ok=True)
+
+            # Generate unique filename if not provided
+            if not output_filename:
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                output_filename = f"{platform}_ads_{timestamp}.png"
+
+            filepath = output_dir / output_filename
+
+            # Generate image with Gemini
+            response = self.client.models.generate_images(
+                model="imagen-3.0-generate-002",
+                prompt=refined_prompt,
+                config=types.GenerateImagesConfig(
+                    number_of_images=1,
+                    aspect_ratio=aspect_ratio,
+                ),
+            )
+
+            if not response.generated_images:
+                print("❌ No image was generated. Try refining your prompt.")
+                return None
+
+            # Extract image bytes
+            image_data = response.generated_images[0].image.image_bytes
+            img = Image.open(io.BytesIO(image_data))
+
+            # Save the image
+            img.save(filepath)
+            print(f"✅ Success! Image saved at {filepath}")
+            return filepath
+
+        except Exception as e:
+            print(f"⚠️ Error while generating image: {e}")
+            return None
