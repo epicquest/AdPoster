@@ -39,4 +39,6 @@ class FacebookPoster:
         }
         post_response = requests.post(post_url, json=post_payload)
         post_response.raise_for_status()
-        return post_response.json()
+        result = post_response.json()
+        print(f"Posting image to Facebook: {result}")
+        return result

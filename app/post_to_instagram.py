@@ -9,8 +9,8 @@ from instagram_api.instagram_poster import InstagramPoster
 
 
 iposter = InstagramPoster()
-image_path = "output/ads_instagram_20250903_185305.png"
-ads_json_path = "output/ads_20250903_185310.json"
+image_path = "output/ads_instagram_20250904_170446.png"
+ads_json_path = "output/ads_20250904_170453.json"
 
 with open(ads_json_path, "r") as f:
     ads_data = json.load(f)

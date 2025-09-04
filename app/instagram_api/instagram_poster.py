@@ -32,7 +32,9 @@ class InstagramPoster:
         }
         publish_response = requests.post(publish_url, data=publish_payload)
         publish_response.raise_for_status()
-        return publish_response.json()
+        result = publish_response.json()
+        print(f"Posting image to Instagram: {result}")
+        return result
     
     def post_image_fake(self, image_path, caption):
         print(f"Posting image to Instagram: {image_path}")

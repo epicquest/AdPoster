@@ -29,6 +29,7 @@ class AppInfo:
     description: str
     category: str
     key_features: List[str]
+    game_guide: str
     target_audience: str
     play_store_url: str
     icon_path: Optional[str] = None
@@ -150,6 +151,7 @@ class AdPoster:
         Key Features: {', '.join(app_info.key_features)}
         Target Audience: {app_info.target_audience}
         Play Store URL: {app_info.play_store_url}
+        Game guide: [{app_info.game_guide}]
 
         Platform Requirements:
         - Maximum characters allowed: {max_chars}
@@ -320,7 +322,8 @@ def main():
     ad_poster = AdPoster(GOOGLE_API_KEY)
 
     # Example app information
-    app_info: AppInfo = AppInfo(**APP_TEMPLATES['game_terra_nova'])
+    #app_info: AppInfo = AppInfo(**APP_TEMPLATES['game_terra_nova'])
+    app_info: AppInfo = AppInfo(**APP_TEMPLATES['illusion_of_mastery'])
 
     # Generate ads for multiple platforms
    # platforms = ["facebook", "instagram", "twitter", "linkedin"]
@@ -330,8 +333,6 @@ def main():
     # Display previews
     for platform, ad_content in ads.items():
         ad_poster.print_ad_preview(ad_content)
-
-       
         ad_poster.generate_image_from_text(platform, ad_content.suggested_image_description)
 
     # Save to file
