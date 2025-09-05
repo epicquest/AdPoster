@@ -14,8 +14,9 @@ with open(ads_json_path, "r") as f:
 
 body_text = ads_data.get("bluesky", {}).get("body_text")
 image_path = ads_data.get("bluesky", {}).get("image_path")
+play_store_url = ads_data.get("bluesky", {}).get("play_store_url")
 if (not image_path) or (not os.path.exists(image_path)):
     print("No valid image path found for Bluesky post.")
     exit(1)
-result = poster.post_image(image_path, body_text)
+result = poster.post_image(image_path, body_text, play_store_url)
 print(result)

@@ -305,7 +305,7 @@ PLATFORM_SETTINGS = {
         ]
     },
     "bluesky": {
-        "max_chars": 250,
+        "max_chars": 200,
         "hashtag_limit": 5,  # Not enforced, hashtags uncommon
         "optimal_image_size": (1200, 675),
         "max_image_filesize_kb": 976,  # Hard limit from API

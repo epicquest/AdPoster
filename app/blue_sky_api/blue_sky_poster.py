@@ -44,16 +44,19 @@ class BlueskyPoster:
             response.raise_for_status()
             return response.json()["blob"]
 
-    def post_image(self, image_path, message):
-        """Post a skeet with image + text"""
+    def post_image(self, image_path, message, app_url: str|None = None):
+        """Post a skeet with image + text + url (optional)"""
         if not self.session:
             self.login()
 
         # Check the grapheme length and truncate if necessary
-        if grapheme.length(message) > 250:
+        if grapheme.length(message) > 220:
             # Truncate and add an ellipsis to show it was shortened
-            message = grapheme.slice(message, end=250) + "..."
+            message = grapheme.slice(message, end=220) + "..."
             
+        if app_url:
+            message = f"{message} {app_url}"
+
         blob = self.upload_image(image_path)
 
         now = datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
