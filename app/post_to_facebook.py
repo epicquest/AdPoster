@@ -7,11 +7,15 @@ from facebook_api.facebook_poster import FacebookPoster
 #https://graph.facebook.com/v23.0/me/accounts?access_token={your-user-access-token}
 
 fposter = FacebookPoster()
-image_path = "output/ads_facebook_20250904_170441.png"
-ads_json_path = "output/ads_20250904_170453.json"
+ads_json_path = "output/ads_20250905_174046.json"
 
 with open(ads_json_path, "r") as f:
     ads_data = json.load(f)
 
 body_text = ads_data.get("facebook", {}).get("body_text", "Check out our new ad!")
+
+image_path = ads_data.get("facebook", {}).get("image_path")
+if (not image_path) or (not os.path.exists(image_path)):
+    print("No valid image path found for Facebook post.")
+    exit(1)
 fposter.post_image(image_path, body_text)

@@ -46,6 +46,7 @@ class AdContent:
     call_to_action: str
     suggested_image_description: str
     timestamp: str
+    image_path: Optional[str] = None
 
 
 class AdPoster:
@@ -240,6 +241,7 @@ class AdPoster:
             if platform in self.platform_configs:
                 ad_content = self.generate_ad_content(app_info, platform)
                 if ad_content:
+                    ad_content.image_path = self.generate_image_from_text(platform, ad_content.suggested_image_description)
                     ads[platform] = ad_content
             else:
                 self.logger.warning(f"Platform {platform} not supported")
@@ -264,6 +266,7 @@ class AdPoster:
                 "hashtags": ad_content.hashtags,
                 "call_to_action": ad_content.call_to_action,
                 "suggested_image_description": ad_content.suggested_image_description,
+                "image_path": ad_content.image_path,
                 "timestamp": ad_content.timestamp
             }
 
@@ -284,6 +287,7 @@ class AdPoster:
         print(f"\nHashtags: {' '.join(ad_content.hashtags)}")
         print(f"\nCall to Action: {ad_content.call_to_action}")
         print(f"\nSuggested Image: {ad_content.suggested_image_description}")
+        print(f"\nImage: {ad_content.image_path}")
         print(f"{'=' * 50}\n")
 
     def generate_image_from_text(self, platform: str, prompt: str) -> str:
@@ -328,12 +332,12 @@ def main():
     # Generate ads for multiple platforms
    # platforms = ["facebook", "instagram", "twitter", "linkedin"]
     platforms = ["facebook", "instagram"]
+    #platforms = [ "bluesky"]
     ads = ad_poster.generate_multiple_ads(app_info, platforms)
 
     # Display previews
     for platform, ad_content in ads.items():
         ad_poster.print_ad_preview(ad_content)
-        ad_poster.generate_image_from_text(platform, ad_content.suggested_image_description)
 
     # Save to file
     saved_file = ad_poster.save_ads_to_file(ads)

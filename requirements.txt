@@ -16,4 +16,5 @@ praw
 langchain
 langchain_google_genai
 requests
+grapheme
 dotenv
