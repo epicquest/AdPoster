@@ -40,6 +40,7 @@ class AppInfo:
 class AdContent:
     """Generated ad content structure"""
     platform: str
+    play_store_url: str
     headline: str
     body_text: str
     hashtags: List[str]
@@ -223,7 +224,8 @@ class AdPoster:
                     hashtags=content_json["hashtags"],
                     call_to_action=content_json["call_to_action"],
                     suggested_image_description=content_json["suggested_image_description"],
-                    timestamp=datetime.now().isoformat()
+                    timestamp=datetime.now().isoformat(),
+                    play_store_url=app_info.play_store_url
                 )
 
                 self.logger.info(f"Successfully generated ad content for {platform}")
@@ -267,7 +269,8 @@ class AdPoster:
                 "call_to_action": ad_content.call_to_action,
                 "suggested_image_description": ad_content.suggested_image_description,
                 "image_path": ad_content.image_path,
-                "timestamp": ad_content.timestamp
+                "timestamp": ad_content.timestamp,
+                "play_store_url": ad_content.play_store_url
             }
 
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -331,7 +334,7 @@ def main():
 
     # Generate ads for multiple platforms
    # platforms = ["facebook", "instagram", "twitter", "linkedin"]
-    platforms = ["facebook", "instagram"]
+    platforms = ["facebook"]
     #platforms = [ "bluesky"]
     ads = ad_poster.generate_multiple_ads(app_info, platforms)
 
