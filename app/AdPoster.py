@@ -235,7 +235,7 @@ class AdPoster:
             self.logger.error(f"Error generating ad content for {platform}: {str(e)}")
             return None
 
-    def generate_multiple_ads(self, app_info: AppInfo, platforms: List[str]) -> Dict[str, AdContent]:
+    def generate_multiple_ads(self, app_info: AppInfo, platforms: List[str], generate_images: bool = True) -> Dict[str, AdContent]:
         """Generate ads for multiple platforms"""
         ads = {}
 
@@ -243,7 +243,8 @@ class AdPoster:
             if platform in self.platform_configs:
                 ad_content = self.generate_ad_content(app_info, platform)
                 if ad_content:
-                    ad_content.image_path = self.generate_image_from_text(platform, ad_content.suggested_image_description)
+                    if generate_images:
+                        ad_content.image_path = self.generate_image_from_text(platform, ad_content.suggested_image_description)
                     ads[platform] = ad_content
             else:
                 self.logger.warning(f"Platform {platform} not supported")
@@ -329,14 +330,15 @@ def main():
     ad_poster = AdPoster(GOOGLE_API_KEY)
 
     # Example app information
-    #app_info: AppInfo = AppInfo(**APP_TEMPLATES['game_terra_nova'])
+    # app_info: AppInfo = AppInfo(**APP_TEMPLATES['game_terra_nova'])
     app_info: AppInfo = AppInfo(**APP_TEMPLATES['illusion_of_mastery'])
 
     # Generate ads for multiple platforms
    # platforms = ["facebook", "instagram", "twitter", "linkedin"]
-    platforms = ["facebook"]
+    # platforms = ["facebook", "instagram", "bluesky"]
     #platforms = [ "bluesky"]
-    ads = ad_poster.generate_multiple_ads(app_info, platforms)
+    platforms = [ "twitter"]
+    ads = ad_poster.generate_multiple_ads(app_info, platforms, generate_images=False)
 
     # Display previews
     for platform, ad_content in ads.items():

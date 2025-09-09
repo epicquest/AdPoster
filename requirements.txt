@@ -18,3 +18,4 @@ langchain_google_genai
 requests
 grapheme
 dotenv
+requests-oauthlib

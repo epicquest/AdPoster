@@ -50,9 +50,9 @@ class BlueskyPoster:
             self.login()
 
         # Check the grapheme length and truncate if necessary
-        if grapheme.length(message) > 220:
+        if grapheme.length(message) > 150:
             # Truncate and add an ellipsis to show it was shortened
-            message = grapheme.slice(message, end=220) + "..."
+            message = grapheme.slice(message, end=150) + "..."
             
         if app_url:
             message = f"{message} {app_url}"
