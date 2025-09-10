@@ -12,35 +12,6 @@ load_dotenv()
 
 # App Templates - You can define multiple apps here
 APP_TEMPLATES = {
-    # "fitness_app": {
-    #     "name": "FitnessTracker Pro",
-    #     "description": "Complete fitness tracking app with workout plans, nutrition tracking, and progress analytics",
-    #     "category": "Health & Fitness",
-    #     "key_features": [
-    #         "Custom workout plans",
-    #         "Calorie tracking",
-    #         "Progress analytics",
-    #         "Social sharing",
-    #         "Offline mode"
-    #     ],
-    #     "target_audience": "Fitness enthusiasts aged 18-45",
-    #     "play_store_url": "https://play.google.com/store/apps/details?id=com.example.fitnesstracker"
-    # },
-    #
-    # "productivity_app": {
-    #     "name": "TaskMaster",
-    #     "description": "Smart task management app with AI-powered scheduling and productivity insights",
-    #     "category": "Productivity",
-    #     "key_features": [
-    #         "AI task scheduling",
-    #         "Team collaboration",
-    #         "Time tracking",
-    #         "Goal setting",
-    #         "Cross-platform sync"
-    #     ],
-    #     "target_audience": "Professionals and students aged 22-50",
-    #     "play_store_url": "https://play.google.com/store/apps/details?id=com.example.taskmaster"
-    # },
 
     "game_terra_nova": {
         "name": "Terra Nova",
@@ -232,6 +203,64 @@ Challenge yourself and see what you really know.
 
 Review & Learn
 Get immediate feedback to reinforce learning and fill knowledge gaps.
+""",
+        "target_audience": "People aged 13-60",
+        "play_store_url": "https://play.google.com/store/apps/details?id=com.epicqueststudios.illusionofmasteryandroid"
+    },
+     "dark_stories": {
+        "name": "Dark Stories AI",
+        "description": """ 
+ Dark Stories: AI-Powered Mystery Puzzles
+
+Dive into the mysterious world of Dark Stories, a modern reimagining of the classic Black Stories game, now powered by advanced AI. Each puzzle presents you with the enigmatic conclusion to a dark tale - your mission is to uncover what really happened.
+
+UNIQUE AI-GENERATED CONTENT:
+- Every dark story is uniquely created by Gemini AI
+- Never run out of puzzles with continuously generated new content
+- Experience endless variety with AI-crafted mysteries
+
+HOW TO PLAY:
+1. Read the mysterious conclusion of a dark tale
+2. Ask yes/no questions to uncover what happened
+3. Piece together clues to solve the mystery
+4. Stump your friends with puzzles they haven't heard before
+
+GET ANSWERS FROM AI:
+- No need for a dedicated game master
+- Ask your questions directly to Gemini AI
+- Receive consistent and logical answers that maintain the mystery
+
+FEATURES:
+- Perfect for parties, road trips, or casual game nights
+- Play solo or with friends
+- Mysteries range from mildly spooky to deeply disturbing
+- Simple interface lets you focus on solving the puzzle
+- Save favorite stories to replay with different friends
+
+PERFECT FOR:
+- Mystery lovers and puzzle enthusiasts
+- Fans of the classic Black Stories game looking for fresh content
+- Those who enjoy testing their deductive reasoning
+- Anyone who loves a good brain teaser
+
+Whether you're a seasoned detective or new to mystery puzzles, Dark Stories offers a fresh, AI-powered experience that will keep you guessing. Each story is a unique creation, ensuring you never see the same puzzle twice.
+
+Download now and start unraveling the mysteries!
+""",
+        "category": "Entertainment",
+        "key_features": [
+            "Powered by Gemini AI",
+            "Unique AI-generated stories",
+            "Ask questions directly to AI",
+            "Play solo or with friends",
+            "Endless variety of puzzles"
+        ],
+        "game_guide": """
+How to Play Dark Stories:
+1. Read the mysterious conclusion of a dark tale.
+2. Ask yes/no questions to uncover what happened.
+3. Piece together clues to solve the mystery.
+4. Stump your friends with puzzles they haven't heard before.
 """,
         "target_audience": "People aged 13-60",
         "play_store_url": "https://play.google.com/store/apps/details?id=com.epicqueststudios.illusionofmasteryandroid"

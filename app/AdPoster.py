@@ -86,8 +86,9 @@ class AdPoster:
 
 def main():
     """Example usage of AdPoster"""
-    app_info: AppInfo = AppInfo(**APP_TEMPLATES['game_terra_nova'])
+    # app_info: AppInfo = AppInfo(**APP_TEMPLATES['game_terra_nova'])
     # app_info: AppInfo = AppInfo(**APP_TEMPLATES['illusion_of_mastery'])
+    app_info: AppInfo = AppInfo(**APP_TEMPLATES['dark_stories'])
 
     # Generate ads for multiple platforms
     # platforms = ["facebook", "instagram", "twitter", "linkedin"]
