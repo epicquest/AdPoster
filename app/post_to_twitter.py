@@ -1,0 +1,21 @@
+from twitter_api.twitter_poster import TwitterPoster
+import json
+import os
+
+poster = TwitterPoster()
+
+ads_json_path = "output/ads_20250909_190304.json"
+
+
+with open(ads_json_path, "r") as f:
+    ads_data = json.load(f)
+
+body_text = ads_data.get("twitter", {}).get("body_text")
+image_path = ads_data.get("twitter", {}).get("image_path")
+play_store_url = ads_data.get("twitter", {}).get("play_store_url")
+# if (not image_path) or (not os.path.exists(image_path)):
+#     print("No valid image path found for Twitter/X post.")
+#     exit(1)
+result = poster.post_text_and_link(body_text, play_store_url)
+
+print(result)

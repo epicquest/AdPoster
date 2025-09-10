@@ -7,7 +7,8 @@ from blue_sky_api.blue_sky_poster import BlueskyPoster
 poster = BlueskyPoster()
  
 # image_path = "output/ads_facebook_20250904_170441.png"
-ads_json_path = "output/ads_20250905_173401.json"
+ads_json_path = "output/ads_20250909_160647.json"
+
 
 with open(ads_json_path, "r") as f:
     ads_data = json.load(f)

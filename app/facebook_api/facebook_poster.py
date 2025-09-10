@@ -13,7 +13,7 @@ class FacebookPoster:
         self.access_token = access_token
 
 
-    def post_image_and_comment(self, image_path, message, comment_message = None, app_url: str|None = None):
+    def post_image_and_comment(self, image_path: str|None, message, comment_message = None, app_url: str|None = None):
         post_id = self.post_image(image_path, message)
 
         if comment_message is None:
@@ -23,33 +23,41 @@ class FacebookPoster:
         if comment_message:
             comment_id = self.post_comment(post_id, comment_message)
 
-    def post_image(self, image_path, message):
+    def post_image(self, image_path: str|None, message):
         """
         Posts an image and text to the Facebook page.
         Returns the ID of the new post.
         """
-        # Step 1: Upload the image and get its ID
-        with open(image_path, 'rb') as img:
-            files = {
-                'source': img,
-            }
-            upload_payload = {
+        if image_path is None or not os.path.exists(image_path):
+            # No media file, post just the text
+            post_url = f'https://graph.facebook.com/v23.0/{self.page_id}/feed'
+            post_payload = {
                 'access_token': self.access_token,
-                'published': 'false'
+                'message': message
             }
-            upload_url = f'https://graph.facebook.com/v23.0/{self.page_id}/photos'
-            response = requests.post(upload_url, files=files, data=upload_payload)
-            response.raise_for_status()
-            photo_id = response.json()['id']
-            print(f"Image uploaded successfully. Photo ID: {photo_id}")
+        else:
+            # Step 1: Upload the image and get its ID
+            with open(image_path, 'rb') as img:
+                files = {
+                    'source': img,
+                }
+                upload_payload = {
+                    'access_token': self.access_token,
+                    'published': 'false'
+                }
+                upload_url = f'https://graph.facebook.com/v23.0/{self.page_id}/photos'
+                response = requests.post(upload_url, files=files, data=upload_payload)
+                response.raise_for_status()
+                photo_id = response.json()['id']
+                print(f"Image uploaded successfully. Photo ID: {photo_id}")
 
-        # Step 2: Create the main post with the uploaded image
-        post_url = f'https://graph.facebook.com/v23.0/{self.page_id}/feed'
-        post_payload = {
-            'access_token': self.access_token,
-            'message': message,
-            'attached_media': [{'media_fbid': photo_id}]
-        }
+            # Step 2: Create the main post with the uploaded image
+            post_url = f'https://graph.facebook.com/v23.0/{self.page_id}/feed'
+            post_payload = {
+                'access_token': self.access_token,
+                'message': message,
+                'attached_media': [{'media_fbid': photo_id}]
+            }
         post_response = requests.post(post_url, json=post_payload)
         post_response.raise_for_status()
         post_id = post_response.json()['id']

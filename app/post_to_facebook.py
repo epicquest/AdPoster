@@ -8,7 +8,7 @@ from facebook_api.facebook_poster import FacebookPoster
 #https://graph.facebook.com/v23.0/me/accounts?access_token={your-user-access-token}
 
 fposter = FacebookPoster()
-ads_json_path = "output/ads_20250905_181928.json"
+ads_json_path = "output/ads_20250909_155354.json"
 
 with open(ads_json_path, "r") as f:
     ads_data = json.load(f)

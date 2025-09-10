@@ -87,5 +87,6 @@ class BlueskyPoster:
             json=payload,  
         )
         response.raise_for_status()
+        print(f"Post created successfully. : {response.json()}")
         return response.json()
 

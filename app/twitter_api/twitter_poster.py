@@ -100,7 +100,7 @@ class TwitterPoster:
             # automatically shorten it and handle the rich media preview.
             full_message = f"{message}\n\n{app_url}"
 
-        # tweet_id = self._post_tweet(full_message)
+        # tweet_id = self._post_tweet(message=full_message)
         tweet_id = self._post_tweet(message=message)
 
         return tweet_id
