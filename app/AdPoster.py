@@ -91,15 +91,15 @@ def main():
     app_info: AppInfo = AppInfo(**APP_TEMPLATES['dark_stories'])
 
     # Generate ads for multiple platforms
-    # platforms = ["facebook", "instagram", "twitter", "linkedin"]
+    platforms = ["facebook", "instagram", "twitter", "bluesky"]
     # platforms = ["facebook", "instagram", "bluesky"]
     # platforms = [ "bluesky"]
-    platforms = [ "twitter"]
+   # platforms = [ "twitter"]
     #  platforms = [ "instagram"]
     # platforms = [ "facebook"]
     poster = AdPoster()
-    poster.generate_and_post(app_info, platforms, generate_images=True)
-    # poster.generate_ads(app_info, platforms)
+    # poster.generate_and_post(app_info, platforms, generate_images=True)
+    poster.generate_ads(app_info, platforms)
 
 if __name__ == "__main__":
     main()

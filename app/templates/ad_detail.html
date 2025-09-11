@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ad Details</title>
+</head>
+<body>
+    <h1>Ad Details</h1>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .platform-section {
+            margin-bottom: 30px;
+        }
+        .hashtags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .hashtag {
+            background-color: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+    </style>
+
+    {% for platform in ['bluesky', 'twitter', 'facebook', 'instagram'] %}
+        {% if platform in ad %}
+        <div class="platform-section">
+            <h2>{{ platform|title }} Ad</h2>
+            <table>
+                <tr>
+                    <th>Headline</th>
+                    <td>{{ ad.get(platform, {}).get('headline', '') }}</td>
+                </tr>
+                <tr>
+                    <th>Body Text</th>
+                    <td style="white-space: pre-wrap;">{{ ad.get(platform, {}).get('body_text', '') }}</td>
+                </tr>
+                {% if ad.get(platform, {}).get('hashtags') %}
+                <tr>
+                    <th>Hashtags</th>
+                    <td>
+                        <div class="hashtags">
+                            {% for tag in ad.get(platform, {}).get('hashtags', []) %}
+                                <span class="hashtag">#{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Call to Action</th>
+                    <td>{{ ad.get(platform, {}).get('call_to_action', '') }}</td>
+                </tr>
+                {% if ad.get(platform, {}).get('image_path') %}
+                <tr>
+                    <th>Image</th>
+                    <td><img src="/{{ ad.get(platform, {}).get('image_path', '') }}" alt="Ad Image" style="max-width: 400px;"></td>
+                </tr>
+                {% endif %}
+                {% if ad.get(platform, {}).get('play_store_url') %}
+                <tr>
+                    <th>Play Store URL</th>
+                    <td><a href="{{ ad.get(platform, {}).get('play_store_url', '') }}" target="_blank">{{ ad.get(platform, {}).get('play_store_url', '') }}</a></td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+        {% endif %}
+    {% endfor %}
+    <form action="/ad/{{ ad_file }}/confirm" method="post">
+        <button type="submit">Confirm</button>
+    </form>
+    <form action="/ad/{{ ad_file }}/reject" method="post">
+        <button type="submit">Reject</button>
+    </form>
+    <a href="/">Back to Home</a>
+</body>
+</html>
