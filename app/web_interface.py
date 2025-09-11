@@ -4,6 +4,7 @@ import json
 import re
 import logging
 from datetime import datetime
+from config import APP_TEMPLATES, PLATFORM_SETTINGS
 
 app = Flask(__name__)
 
@@ -295,6 +296,39 @@ def post_ad(ad_file, platform):
         json.dump(ad_data, f, indent=4)
 
     return jsonify({"status": "success", "post_time": post_time, "platform": platform})
+
+@app.route('/generate')
+def generate_ad_page():
+    """Display the ad generation page."""
+    app_templates = APP_TEMPLATES
+    platform_settings = PLATFORM_SETTINGS
+    return render_template('generate.html', 
+                         app_templates=app_templates, 
+                         platform_settings=platform_settings)
+
+@app.route('/generate', methods=['POST'])
+def generate_ad():
+    """Handle ad generation form submission."""
+    # Get form data
+    selected_app = request.form.get('app_name')
+    selected_platforms = request.form.getlist('platforms')
+    generate_images = request.form.get('generate_images') == 'on'
+    custom_feature = request.form.get('custom_feature', '').strip()
+    
+    # For now, this is a fake implementation
+    # In the future, this would call the actual ad generation logic
+    result = {
+        "status": "success",
+        "message": "Ad generation is not yet implemented",
+        "data": {
+            "app": selected_app,
+            "platforms": selected_platforms,
+            "generate_images": generate_images,
+            "custom_feature": custom_feature
+        }
+    }
+    
+    return jsonify(result)
 
 @app.route('/output/<path:filename>')
 def serve_output_file(filename):

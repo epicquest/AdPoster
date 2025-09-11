@@ -69,6 +69,38 @@
             animation: fadeInUp 1s ease-out 0.2s both;
         }
 
+        .action-buttons {
+            margin-top: 30px;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .generate-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(78, 205, 196, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .generate-btn i {
+            font-size: 1.2rem;
+        }
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -427,6 +459,12 @@
         <div class="header">
             <h1 class="main-title">AdPoster</h1>
             <p class="subtitle">{{ total_campaigns }} campaign{% if total_campaigns != 1 %}s{% endif %} ready to manage across all platforms</p>
+            <div class="action-buttons">
+                <a href="/generate" class="generate-btn">
+                    <i class="fas fa-plus"></i>
+                    Generate New Ad
+                </a>
+            </div>
         </div>
 
         <div class="ads-container">
