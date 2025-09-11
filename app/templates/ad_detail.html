@@ -4,6 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ad Details</title>
+    <script>
+        function handlePostNow(platform, adFile) {
+            const postButton = document.getElementById(`post-button-${platform}`);
+            const rejectButton = document.getElementById(`reject-button-${platform}`);
+            const postTimeElement = document.getElementById(`post-time-${platform}`);
+
+            fetch(`/ad/${adFile}/${platform}/post`, {
+                method: 'POST',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    postButton.style.display = 'none';
+                    rejectButton.style.display = 'none';
+                    postTimeElement.textContent = `Posted at: ${data.post_time}`;
+                } else {
+                    alert(data.message || 'An error occurred.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while posting.');
+            });
+        }
+
+        function initializeButtons() {
+            const platforms = ['bluesky', 'twitter', 'facebook', 'instagram'];
+            platforms.forEach(platform => {
+                const postTime = document.getElementById(`post-time-${platform}`).dataset.postTime;
+                const postButton = document.getElementById(`post-button-${platform}`);
+                const rejectButton = document.getElementById(`reject-button-${platform}`);
+
+                if (postTime) {
+                    postButton.style.display = 'none';
+                    rejectButton.style.display = 'none';
+                }
+            });
+        }
+
+        window.onload = initializeButtons;
+    </script>
 </head>
 <body>
     <h1>Ad Details</h1>
@@ -78,15 +119,20 @@
                 </tr>
                 {% endif %}
             </table>
+            <form id="post-button-{{ platform }}" style="display: inline;">
+                <button type="button" onclick="handlePostNow('{{ platform }}', '{{ ad_file }}')">Post Now</button>
+            </form>
+            <form id="reject-button-{{ platform }}" style="display: inline;">
+                <button type="submit">Reject</button>
+            </form>
+            <span id="post-time-{{ platform }}" data-post-time="{{ ad.get(platform, {}).get('post_time', '') }}">
+                {% if ad.get(platform, {}).get('post_time') %}
+                    Posted at: {{ ad.get(platform, {}).get('post_time') }}
+                {% endif %}
+            </span>
         </div>
         {% endif %}
     {% endfor %}
-    <form action="/ad/{{ ad_file }}/confirm" method="post">
-        <button type="submit">Confirm</button>
-    </form>
-    <form action="/ad/{{ ad_file }}/reject" method="post">
-        <button type="submit">Reject</button>
-    </form>
     <a href="/">Back to Home</a>
 </body>
 </html>

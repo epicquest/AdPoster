@@ -3,6 +3,7 @@ import os
 import json
 import re
 import logging
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -65,6 +66,29 @@ def reject_ad(ad_file):
     """Mark an ad as rejected."""
     # Logic to mark the ad as rejected (e.g., update JSON or database)
     return jsonify({"status": "rejected", "ad_file": ad_file})
+
+@app.route('/ad/<ad_file>/<platform>/post', methods=['POST'])
+def post_ad(ad_file, platform):
+    """Handle the 'Post Now' action for a specific platform."""
+    ad_path = os.path.join(OUTPUT_DIR, ad_file)
+    if not os.path.exists(ad_path):
+        return jsonify({"status": "error", "message": "Ad not found"}), 404
+
+    with open(ad_path, 'r') as f:
+        ad_data = json.load(f)
+
+    # Add post time to the JSON data
+    post_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    if platform not in ad_data:
+        return jsonify({"status": "error", "message": "Platform not found in ad"}), 400
+
+    ad_data[platform]['post_time'] = post_time
+
+    # Save the updated JSON file
+    with open(ad_path, 'w') as f:
+        json.dump(ad_data, f, indent=4)
+
+    return jsonify({"status": "success", "post_time": post_time, "platform": platform})
 
 @app.route('/output/<path:filename>')
 def serve_output_file(filename):
