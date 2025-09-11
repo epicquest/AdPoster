@@ -125,13 +125,13 @@
 
         .ads-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 25px;
         }
 
         .ad-card {
             background: #f8f9fa;
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 25px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 5px solid transparent;
@@ -152,7 +152,7 @@
 
         .ad-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
             background: white;
         }
 
@@ -166,34 +166,160 @@
             display: block;
         }
 
-        .ad-filename {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 10px;
+        .campaign-header {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 15px;
         }
 
-        .file-icon {
-            width: 35px;
-            height: 35px;
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
-            border-radius: 10px;
+        .app-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 0.9rem;
+            font-size: 1.3rem;
+            flex-shrink: 0;
         }
 
-        .ad-meta {
+        .app-details {
+            flex: 1;
+        }
+
+        .app-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .creation-date {
             color: #6c757d;
             font-size: 0.9rem;
             display: flex;
             align-items: center;
+            gap: 6px;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .status-completed {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            animation: subtle-pulse 3s infinite;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #e17055;
+        }
+
+        @keyframes subtle-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .platforms-row {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .platforms-label {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
             gap: 8px;
+        }
+
+        .platform-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .platform-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .platform-badge[data-platform="facebook"] {
+            background: linear-gradient(135deg, #4267B2, #365899);
+            color: white;
+        }
+
+        .platform-badge[data-platform="twitter"] {
+            background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+            color: white;
+        }
+
+        .platform-badge[data-platform="instagram"] {
+            background: linear-gradient(135deg, #E4405F, #FCAF45);
+            color: white;
+        }
+
+        .platform-badge[data-platform="bluesky"] {
+            background: linear-gradient(135deg, #00bcd4, #0097a7);
+            color: white;
+        }
+
+        .platform-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        .campaign-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .stat-item i {
+            color: #667eea;
         }
 
         .empty-state {
@@ -235,6 +361,34 @@
             .ads-grid {
                 grid-template-columns: 1fr;
             }
+
+            .campaign-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .app-info {
+                width: 100%;
+            }
+
+            .status-badge {
+                align-self: flex-start;
+            }
+
+            .platform-icons {
+                gap: 8px;
+            }
+
+            .platform-badge {
+                font-size: 0.75rem;
+                padding: 5px 10px;
+            }
+
+            .campaign-stats {
+                flex-direction: column;
+                gap: 8px;
+            }
         }
     </style>
 
@@ -257,15 +411,69 @@
                 {% for ad in ads %}
                 <div class="ad-card">
                     <a href="/ad/{{ ad.file }}" class="ad-link">
-                        <div class="ad-filename">
-                            <div class="file-icon">
-                                <i class="fas fa-file-alt"></i>
+                        <div class="campaign-header">
+                            <div class="app-info">
+                                <div class="app-icon">
+                                    {% if 'Dark Stories' in ad.app_name %}
+                                        <i class="fas fa-search"></i>
+                                    {% elif 'Terra Nova' in ad.app_name %}
+                                        <i class="fas fa-rocket"></i>
+                                    {% else %}
+                                        <i class="fas fa-mobile-alt"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="app-details">
+                                    <div class="app-name">{{ ad.app_name }}</div>
+                                    <div class="creation-date">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        {{ ad.creation_date }}
+                                    </div>
+                                </div>
                             </div>
-                            {{ ad.file }}
+                            
+                            <div class="status-badge {% if ad.is_fully_posted %}status-completed{% else %}status-pending{% endif %}">
+                                {% if ad.is_fully_posted %}
+                                    <i class="fas fa-check-circle"></i>
+                                    Complete
+                                {% else %}
+                                    <i class="fas fa-clock"></i>
+                                    {{ ad.posting_status }}
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="ad-meta">
-                            <i class="fas fa-calendar"></i>
-                            Campaign Asset
+
+                        <div class="platforms-row">
+                            <div class="platforms-label">
+                                <i class="fas fa-share-alt"></i>
+                                Platforms:
+                            </div>
+                            <div class="platform-icons">
+                                {% for platform in ad.platforms %}
+                                <div class="platform-badge" data-platform="{{ platform }}">
+                                    {% if platform == 'facebook' %}
+                                        <i class="fab fa-facebook-f"></i>
+                                    {% elif platform == 'twitter' %}
+                                        <i class="fab fa-twitter"></i>
+                                    {% elif platform == 'instagram' %}
+                                        <i class="fab fa-instagram"></i>
+                                    {% elif platform == 'bluesky' %}
+                                        <i class="fas fa-cloud"></i>
+                                    {% endif %}
+                                    {{ platform|title }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="campaign-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-images"></i>
+                                <span>{{ ad.images|length }} Images</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-bullhorn"></i>
+                                <span>{{ ad.total_platforms }} Platforms</span>
+                            </div>
                         </div>
                     </a>
                 </div>

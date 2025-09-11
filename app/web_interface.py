@@ -25,7 +25,7 @@ def get_images_for_ad(ad_file):
 
 @app.route('/')
 def home():
-    """Display a list of generated ads with images, sorted by date."""
+    """Display a list of generated ads with enhanced information."""
     ads = []
     # Get all JSON files
     json_files = [f for f in os.listdir(OUTPUT_DIR) if f.endswith('.json')]
@@ -33,10 +33,76 @@ def home():
     # Sort files by the timestamp in filename (format: ads_YYYYMMDD_HHMMSS.json)
     json_files.sort(key=lambda x: x.split('_')[1:3] if len(x.split('_')) >= 3 else ['00000000', '000000'], reverse=True)
     
-    # Create list of ads with their images
+    # Create list of ads with enhanced information
     for file_name in json_files:
-        images = get_images_for_ad(file_name)
-        ads.append({"file": file_name, "images": images})
+        ad_path = os.path.join(OUTPUT_DIR, file_name)
+        try:
+            with open(ad_path, 'r') as f:
+                ad_data = json.load(f)
+            
+            # Extract meaningful information
+            platforms = list(ad_data.keys())
+            app_name = None
+            posted_count = 0
+            total_platforms = len(platforms)
+            creation_date = None
+            
+            # Get app name from the first platform's content
+            for platform in platforms:
+                if 'headline' in ad_data[platform]:
+                    # Try to extract app name from headline or body
+                    headline = ad_data[platform]['headline']
+                    if 'Dark Stories' in headline:
+                        app_name = "Dark Stories: AI"
+                    elif 'Terra Nova' in headline:
+                        app_name = "Terra Nova"
+                    else:
+                        # Extract app name from headline (first few words)
+                        app_name = headline.split(':')[0] if ':' in headline else headline.split('!')[0]
+                    break
+            
+            # Count posted platforms
+            for platform in platforms:
+                if 'post_time' in ad_data[platform]:
+                    posted_count += 1
+            
+            # Extract creation date from filename
+            try:
+                date_part = file_name.split('_')[1]  # YYYYMMDD
+                time_part = file_name.split('_')[2].replace('.json', '')  # HHMMSS
+                creation_date = f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]} {time_part[:2]}:{time_part[2:4]}:{time_part[4:6]}"
+            except:
+                creation_date = "Unknown"
+            
+            images = get_images_for_ad(file_name)
+            
+            ads.append({
+                "file": file_name,
+                "app_name": app_name or "Unknown App",
+                "platforms": platforms,
+                "posted_count": posted_count,
+                "total_platforms": total_platforms,
+                "creation_date": creation_date,
+                "images": images,
+                "is_fully_posted": posted_count == total_platforms,
+                "posting_status": f"{posted_count}/{total_platforms} posted"
+            })
+            
+        except Exception as e:
+            logging.error(f"Error reading {file_name}: {e}")
+            # Fallback to basic info
+            images = get_images_for_ad(file_name)
+            ads.append({
+                "file": file_name,
+                "app_name": "Error loading",
+                "platforms": [],
+                "posted_count": 0,
+                "total_platforms": 0,
+                "creation_date": "Unknown",
+                "images": images,
+                "is_fully_posted": False,
+                "posting_status": "Error"
+            })
     
     return render_template('home.html', ads=ads)
 
