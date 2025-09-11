@@ -8,3 +8,13 @@
 /adposter_env/
 /app/__pycache__/
 */__pycache__/
+/output/
+/app/blue_sky_api/__pycache__/blue_sky_poster.cpython-312.pyc
+/app/facebook_api/__pycache__/__init__.cpython-312.pyc
+/app/facebook_api/__pycache__/facebook_poster.cpython-312.pyc
+/app/google_api/__pycache__/ads_image_generator.cpython-312.pyc
+/app/imagekit_api/__pycache__/imagekit_upload_image.cpython-312.pyc
+/app/imgbb_api/__pycache__/imgbb_upload_image.cpython-312.pyc
+/app/instagram_api/__pycache__/instagram_poster.cpython-312.pyc
+/app/reddit/reddit_research_results_20250829_181339.json
+/app/twitter_api/__pycache__/twitter_poster.cpython-312.pyc

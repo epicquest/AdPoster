@@ -14,14 +14,48 @@ logging.basicConfig(level=logging.DEBUG)
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), '../output')
 
 def get_images_for_ad(ad_file):
-    """Retrieve image files associated with a specific ad."""
-    base_name = re.sub(r'\.json$', '', ad_file)
+    """Retrieve image files associated with a specific ad by reading the JSON file."""
+    ad_path = os.path.join(OUTPUT_DIR, ad_file)
+    
+    if not os.path.exists(ad_path):
+        logging.debug(f"Ad file {ad_file} does not exist")
+        return [], {}
+    
     images = []
-    for file_name in os.listdir(OUTPUT_DIR):
-        if file_name.startswith(base_name) and file_name.endswith(('.png', '.jpg', '.jpeg')):
-            images.append(file_name)
+    platform_images = {}
+    
+    try:
+        with open(ad_path, 'r') as f:
+            ad_data = json.load(f)
+        
+        # Check each platform for image_path
+        for platform, platform_data in ad_data.items():
+            platform_images[platform] = False  # Initialize as no image
+            
+            if 'image_path' in platform_data:
+                image_path = platform_data['image_path']
+                
+                # Extract just the filename from the path
+                if '/' in image_path:
+                    image_filename = image_path.split('/')[-1]
+                else:
+                    image_filename = image_path
+                
+                # Check if the image file actually exists
+                full_image_path = os.path.join(OUTPUT_DIR, image_filename)
+                if os.path.exists(full_image_path):
+                    images.append(image_filename)
+                    platform_images[platform] = True
+                    logging.debug(f"Found image for {platform}: {image_filename}")
+                else:
+                    logging.debug(f"Image not found for {platform}: {image_filename} (path: {full_image_path})")
+    
+    except Exception as e:
+        logging.error(f"Error reading ad file {ad_file}: {e}")
+    
     logging.debug(f"Images for {ad_file}: {images}")
-    return images
+    logging.debug(f"Platform images: {platform_images}")
+    return images, platform_images
 
 @app.route('/')
 def home():
@@ -47,18 +81,52 @@ def home():
             total_platforms = len(platforms)
             creation_date = None
             
-            # Get app name from the first platform's content
+            # Get app name from the content - improved extraction based on config.py
             for platform in platforms:
-                if 'headline' in ad_data[platform]:
-                    # Try to extract app name from headline or body
-                    headline = ad_data[platform]['headline']
-                    if 'Dark Stories' in headline:
-                        app_name = "Dark Stories: AI"
-                    elif 'Terra Nova' in headline:
+                platform_data = ad_data[platform]
+                
+                # First try to extract from Play Store URL
+                if 'play_store_url' in platform_data:
+                    play_store_url = platform_data['play_store_url']
+                    if 'darkstories' in play_store_url:
+                        app_name = "Dark Stories AI"
+                    elif 'illusionofmasteryandroid' in play_store_url:
+                        app_name = "Illusion of Mastery"
+                    elif 'oneoffive' in play_store_url:
                         app_name = "Terra Nova"
+                    elif 'terranovaadventure' in play_store_url:
+                        app_name = "Terra Nova"
+                
+                # If not found from URL, extract from headline and body text
+                if not app_name and 'headline' in platform_data:
+                    headline = platform_data['headline']
+                    body_text = platform_data.get('body_text', '')
+                    
+                    # Look for specific app names and keywords in content
+                    if 'Dark Stories' in headline or 'Dark Stories' in body_text:
+                        app_name = "Dark Stories AI"
+                    elif 'Terra Nova' in headline or 'Terra Nova' in body_text:
+                        app_name = "Terra Nova"
+                    elif 'Illusion of Mastery' in headline or 'Illusion of Mastery' in body_text:
+                        app_name = "Illusion of Mastery"
+                    elif ('Mystery' in headline or 'Mystery' in body_text) and ('AI' in headline or 'AI' in body_text):
+                        app_name = "Dark Stories AI"
+                    elif 'Space' in headline or 'Galaxy' in body_text or 'Spaceship' in body_text:
+                        app_name = "Terra Nova"
+                    elif 'Quiz' in headline or 'Quiz' in body_text or 'Knowledge' in body_text:
+                        app_name = "Illusion of Mastery"
                     else:
-                        # Extract app name from headline (first few words)
-                        app_name = headline.split(':')[0] if ':' in headline else headline.split('!')[0]
+                        # Extract the main subject from headline
+                        if ':' in headline:
+                            app_name = headline.split(':')[0].strip()
+                        elif '!' in headline:
+                            app_name = headline.split('!')[0].strip()
+                        else:
+                            # Take first 3-4 words as app name
+                            words = headline.split()
+                            app_name = ' '.join(words[:3]) if len(words) >= 3 else headline
+                
+                if app_name:
                     break
             
             # Count posted platforms
@@ -74,7 +142,15 @@ def home():
             except:
                 creation_date = "Unknown"
             
-            images = get_images_for_ad(file_name)
+            images, platform_images = get_images_for_ad(file_name)
+            
+            # Count images per platform
+            platform_image_counts = {
+                'facebook': 1 if platform_images.get('facebook', False) else 0,
+                'instagram': 1 if platform_images.get('instagram', False) else 0,
+                'twitter': 1 if platform_images.get('twitter', False) else 0,
+                'bluesky': 1 if platform_images.get('bluesky', False) else 0
+            }
             
             ads.append({
                 "file": file_name,
@@ -84,6 +160,8 @@ def home():
                 "total_platforms": total_platforms,
                 "creation_date": creation_date,
                 "images": images,
+                "image_count": len(images),
+                "platform_image_counts": platform_image_counts,
                 "is_fully_posted": posted_count == total_platforms,
                 "posting_status": f"{posted_count}/{total_platforms} posted"
             })
@@ -91,7 +169,13 @@ def home():
         except Exception as e:
             logging.error(f"Error reading {file_name}: {e}")
             # Fallback to basic info
-            images = get_images_for_ad(file_name)
+            images, platform_images = get_images_for_ad(file_name)
+            platform_image_counts = {
+                'facebook': 1 if platform_images.get('facebook', False) else 0,
+                'instagram': 1 if platform_images.get('instagram', False) else 0,
+                'twitter': 1 if platform_images.get('twitter', False) else 0,
+                'bluesky': 1 if platform_images.get('bluesky', False) else 0
+            }
             ads.append({
                 "file": file_name,
                 "app_name": "Error loading",
@@ -100,11 +184,13 @@ def home():
                 "total_platforms": 0,
                 "creation_date": "Unknown",
                 "images": images,
+                "image_count": len(images),
+                "platform_image_counts": platform_image_counts,
                 "is_fully_posted": False,
                 "posting_status": "Error"
             })
     
-    return render_template('home.html', ads=ads)
+    return render_template('home.html', ads=ads, total_campaigns=len(ads))
 
 @app.route('/ad/<ad_file>')
 def view_ad(ad_file):
@@ -116,8 +202,62 @@ def view_ad(ad_file):
     with open(ad_path, 'r') as f:
         ad_data = json.load(f)
 
+    # Extract app name using the same logic as the home page
+    app_name = None
+    platforms = list(ad_data.keys())
+    
+    for platform in platforms:
+        platform_data = ad_data[platform]
+        
+        # First try to extract from Play Store URL
+        if 'play_store_url' in platform_data:
+            play_store_url = platform_data['play_store_url']
+            if 'darkstories' in play_store_url:
+                app_name = "Dark Stories AI"
+            elif 'illusionofmasteryandroid' in play_store_url:
+                app_name = "Illusion of Mastery"
+            elif 'oneoffive' in play_store_url:
+                app_name = "Terra Nova"
+            elif 'terranovaadventure' in play_store_url:
+                app_name = "Terra Nova"
+        
+        # If not found from URL, extract from headline and body text
+        if not app_name and 'headline' in platform_data:
+            headline = platform_data['headline']
+            body_text = platform_data.get('body_text', '')
+            
+            # Look for specific app names and keywords in content
+            if 'Dark Stories' in headline or 'Dark Stories' in body_text:
+                app_name = "Dark Stories AI"
+            elif 'Terra Nova' in headline or 'Terra Nova' in body_text:
+                app_name = "Terra Nova"
+            elif 'Illusion of Mastery' in headline or 'Illusion of Mastery' in body_text:
+                app_name = "Illusion of Mastery"
+            elif ('Mystery' in headline or 'Mystery' in body_text) and ('AI' in headline or 'AI' in body_text):
+                app_name = "Dark Stories AI"
+            elif 'Space' in headline or 'Galaxy' in body_text or 'Spaceship' in body_text:
+                app_name = "Terra Nova"
+            elif 'Quiz' in headline or 'Quiz' in body_text or 'Knowledge' in body_text:
+                app_name = "Illusion of Mastery"
+            else:
+                # Extract the main subject from headline
+                if ':' in headline:
+                    app_name = headline.split(':')[0].strip()
+                elif '!' in headline:
+                    app_name = headline.split('!')[0].strip()
+                else:
+                    # Take first 3-4 words as app name
+                    words = headline.split()
+                    app_name = ' '.join(words[:3]) if len(words) >= 3 else headline
+        
+        if app_name:
+            break
+    
+    if not app_name:
+        app_name = "Unknown App"
+
     images = get_images_for_ad(ad_file)
-    response = make_response(render_template('ad_detail.html', ad=ad_data, ad_file=ad_file, images=images))
+    response = make_response(render_template('ad_detail.html', ad=ad_data, ad_file=ad_file, images=images, app_name=app_name))
     response.headers['Content-Type'] = 'text/html'
     return response
 

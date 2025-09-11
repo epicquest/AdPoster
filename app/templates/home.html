@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AdPoster - Social Media Campaign Manager</title>
+    <title>AdPoster - {{ total_campaigns }} Campaign{% if total_campaigns != 1 %}s{% endif %} Ready</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -269,12 +269,43 @@
         .platform-badge {
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 12px;
             border-radius: 15px;
             font-size: 0.8rem;
             font-weight: 500;
             transition: all 0.3s ease;
+            min-width: 100px;
+            position: relative;
+        }
+
+        .platform-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .platform-icon-wrapper {
+            font-size: 0.9rem;
+        }
+
+        .platform-name {
+            font-weight: 500;
+        }
+
+        .image-indicator {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .platform-badge.has-image .image-indicator {
+            color: white;
+        }
+
+        .platform-badge.no-image .image-indicator {
+            color: #f44336;
+            opacity: 0.6;
         }
 
         .platform-badge[data-platform="facebook"] {
@@ -395,7 +426,7 @@
     <div class="container">
         <div class="header">
             <h1 class="main-title">AdPoster</h1>
-            <p class="subtitle">Manage your social media campaigns with ease</p>
+            <p class="subtitle">{{ total_campaigns }} campaign{% if total_campaigns != 1 %}s{% endif %} ready to manage across all platforms</p>
         </div>
 
         <div class="ads-container">
@@ -418,6 +449,8 @@
                                         <i class="fas fa-search"></i>
                                     {% elif 'Terra Nova' in ad.app_name %}
                                         <i class="fas fa-rocket"></i>
+                                    {% elif 'Illusion of Mastery' in ad.app_name %}
+                                        <i class="fas fa-brain"></i>
                                     {% else %}
                                         <i class="fas fa-mobile-alt"></i>
                                     {% endif %}
@@ -449,17 +482,28 @@
                             </div>
                             <div class="platform-icons">
                                 {% for platform in ad.platforms %}
-                                <div class="platform-badge" data-platform="{{ platform }}">
-                                    {% if platform == 'facebook' %}
-                                        <i class="fab fa-facebook-f"></i>
-                                    {% elif platform == 'twitter' %}
-                                        <i class="fab fa-twitter"></i>
-                                    {% elif platform == 'instagram' %}
-                                        <i class="fab fa-instagram"></i>
-                                    {% elif platform == 'bluesky' %}
-                                        <i class="fas fa-cloud"></i>
-                                    {% endif %}
-                                    {{ platform|title }}
+                                <div class="platform-badge {% if ad.platform_image_counts.get(platform, False) %}has-image{% else %}no-image{% endif %}" data-platform="{{ platform }}">
+                                    <div class="platform-info">
+                                        <div class="platform-icon-wrapper">
+                                            {% if platform == 'facebook' %}
+                                                <i class="fab fa-facebook-f"></i>
+                                            {% elif platform == 'twitter' %}
+                                                <i class="fab fa-twitter"></i>
+                                            {% elif platform == 'instagram' %}
+                                                <i class="fab fa-instagram"></i>
+                                            {% elif platform == 'bluesky' %}
+                                                <i class="fas fa-cloud"></i>
+                                            {% endif %}
+                                        </div>
+                                        <span class="platform-name">{{ platform|title }}</span>
+                                    </div>
+                                    <div class="image-indicator">
+                                        {% if ad.platform_image_counts.get(platform, False) %}
+                                            <i class="fas fa-image" title="Image available"></i>
+                                        {% else %}
+                                            <i class="fas fa-image-slash" title="No image"></i>
+                                        {% endif %}
+                                    </div>
                                 </div>
                                 {% endfor %}
                             </div>
@@ -467,12 +511,12 @@
 
                         <div class="campaign-stats">
                             <div class="stat-item">
-                                <i class="fas fa-images"></i>
-                                <span>{{ ad.images|length }} Images</span>
+                                <i class="fas fa-bullhorn"></i>
+                                <span>{{ ad.total_platforms }} Platform{% if ad.total_platforms != 1 %}s{% endif %}</span>
                             </div>
                             <div class="stat-item">
-                                <i class="fas fa-bullhorn"></i>
-                                <span>{{ ad.total_platforms }} Platforms</span>
+                                <i class="fas fa-images"></i>
+                                <span>{{ ad.image_count }}/{{ ad.total_platforms }} Images</span>
                             </div>
                         </div>
                     </a>

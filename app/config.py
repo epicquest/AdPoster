@@ -263,7 +263,7 @@ How to Play Dark Stories:
 4. Stump your friends with puzzles they haven't heard before.
 """,
         "target_audience": "People aged 13-60",
-        "play_store_url": "https://play.google.com/store/apps/details?id=com.epicqueststudios.illusionofmasteryandroid"
+        "play_store_url": "https://play.google.com/store/apps/details?id=com.epicqueststudios.darkstories&hl=en"
     }
 }
 
