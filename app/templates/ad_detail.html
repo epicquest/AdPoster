@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ad Details</title>
+    <title>Ad Details - Social Media Campaign</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script>
         function handlePostNow(platform, adFile) {
             const postButton = document.getElementById(`post-button-${platform}`);
             const rejectButton = document.getElementById(`reject-button-${platform}`);
             const postTimeElement = document.getElementById(`post-time-${platform}`);
+            const statusCard = document.querySelector(`[data-platform="${platform}"] .status-indicator`);
+
+            // Add loading state
+            postButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
+            postButton.disabled = true;
 
             fetch(`/ad/${adFile}/${platform}/post`, {
                 method: 'POST',
@@ -18,15 +25,40 @@
                 if (data.status === 'success') {
                     postButton.style.display = 'none';
                     rejectButton.style.display = 'none';
-                    postTimeElement.textContent = `Posted at: ${data.post_time}`;
+                    postTimeElement.innerHTML = `<i class="fas fa-check-circle"></i> Posted at: ${data.post_time}`;
+                    statusCard.className = 'status-indicator status-posted';
+                    statusCard.innerHTML = '<i class="fas fa-check-circle"></i> Posted';
                 } else {
-                    alert(data.message || 'An error occurred.');
+                    showNotification(data.message || 'An error occurred.', 'error');
+                    postButton.innerHTML = '<i class="fas fa-share"></i> Post Now';
+                    postButton.disabled = false;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while posting.');
+                showNotification('An error occurred while posting.', 'error');
+                postButton.innerHTML = '<i class="fas fa-share"></i> Post Now';
+                postButton.disabled = false;
             });
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+                ${message}
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
         }
 
         function initializeButtons() {
@@ -35,11 +67,32 @@
                 const postTime = document.getElementById(`post-time-${platform}`).dataset.postTime;
                 const postButton = document.getElementById(`post-button-${platform}`);
                 const rejectButton = document.getElementById(`reject-button-${platform}`);
+                const statusCard = document.querySelector(`[data-platform="${platform}"] .status-indicator`);
 
                 if (postTime) {
                     postButton.style.display = 'none';
                     rejectButton.style.display = 'none';
+                    statusCard.className = 'status-indicator status-posted';
+                    statusCard.innerHTML = '<i class="fas fa-check-circle"></i> Posted';
                 }
+            });
+        }
+
+        function openImageModal(src) {
+            const modal = document.createElement('div');
+            modal.className = 'image-modal';
+            modal.innerHTML = `
+                <div class="image-modal-content">
+                    <span class="close-modal" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                    <img src="${src}" alt="Ad Image">
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            setTimeout(() => modal.classList.add('show'), 10);
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
             });
         }
 
@@ -47,92 +100,627 @@
     </script>
 </head>
 <body>
-    <h1>Ad Details</h1>
     <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            margin-bottom: 20px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
-        th {
-            background-color: #f2f2f2;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
         }
-        .platform-section {
-            margin-bottom: 30px;
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
         }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            border-radius: 2px;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .main-title {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            font-weight: 300;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .platform-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .platform-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--platform-color);
+            transition: height 0.3s ease;
+        }
+
+        .platform-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+        }
+
+        .platform-card:hover::before {
+            height: 8px;
+        }
+
+        .platform-card[data-platform="bluesky"] {
+            --platform-color: linear-gradient(90deg, #1da1f2, #0d8bd9);
+        }
+
+        .platform-card[data-platform="twitter"] {
+            --platform-color: linear-gradient(90deg, #1da1f2, #0d8bd9);
+        }
+
+        .platform-card[data-platform="facebook"] {
+            --platform-color: linear-gradient(90deg, #4267B2, #365899);
+        }
+
+        .platform-card[data-platform="instagram"] {
+            --platform-color: linear-gradient(90deg, #E4405F, #FCAF45, #833AB4);
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .platform-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .platform-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .platform-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--platform-color);
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .status-indicator {
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #e17055;
+        }
+
+        .status-posted {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .content-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .content-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--platform-color);
+        }
+
+        .content-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .content-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .content-value {
+            color: #2c3e50;
+            white-space: pre-wrap;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
         .hashtags {
             display: flex;
             flex-wrap: wrap;
-            gap: 5px;
+            gap: 8px;
+            margin-top: 8px;
         }
+
         .hashtag {
-            background-color: #e9ecef;
-            padding: 2px 8px;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .hashtag:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(116, 185, 255, 0.3);
+        }
+
+        .ad-image {
+            max-width: 100%;
             border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .ad-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .btn-post {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+        }
+
+        .btn-post:hover {
+            background: linear-gradient(135deg, #00a085, #008f7a);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 184, 148, 0.3);
+        }
+
+        .btn-reject {
+            background: linear-gradient(135deg, #e17055, #d63031);
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: linear-gradient(135deg, #d63031, #b71c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(225, 112, 85, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .post-status {
+            margin-top: 15px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: white;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-button:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-modal.show {
+            opacity: 1;
+        }
+
+        .image-modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .image-modal img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 12px;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 500;
+            z-index: 3000;
+            transform: translateX(400px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #e17055, #d63031);
+        }
+
+        .notification.success {
+            background: linear-gradient(135deg, #00b894, #00a085);
+        }
+
+        @media (max-width: 768px) {
+            .platforms-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .platform-card {
+                padding: 20px;
+                margin: 0 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .back-button {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .notification {
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+                transform: translateY(-100px);
+            }
+            
+            .notification.show {
+                transform: translateY(0);
+            }
         }
     </style>
 
-    {% for platform in ['bluesky', 'twitter', 'facebook', 'instagram'] %}
-        {% if platform in ad %}
-        <div class="platform-section">
-            <h2>{{ platform|title }} Ad</h2>
-            <table>
-                <tr>
-                    <th>Headline</th>
-                    <td>{{ ad.get(platform, {}).get('headline', '') }}</td>
-                </tr>
-                <tr>
-                    <th>Body Text</th>
-                    <td style="white-space: pre-wrap;">{{ ad.get(platform, {}).get('body_text', '') }}</td>
-                </tr>
-                {% if ad.get(platform, {}).get('hashtags') %}
-                <tr>
-                    <th>Hashtags</th>
-                    <td>
-                        <div class="hashtags">
-                            {% for tag in ad.get(platform, {}).get('hashtags', []) %}
-                                <span class="hashtag">#{{ tag }}</span>
-                            {% endfor %}
-                        </div>
-                    </td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <th>Call to Action</th>
-                    <td>{{ ad.get(platform, {}).get('call_to_action', '') }}</td>
-                </tr>
-                {% if ad.get(platform, {}).get('image_path') %}
-                <tr>
-                    <th>Image</th>
-                    <td><img src="/{{ ad.get(platform, {}).get('image_path', '') }}" alt="Ad Image" style="max-width: 400px;"></td>
-                </tr>
-                {% endif %}
-                {% if ad.get(platform, {}).get('play_store_url') %}
-                <tr>
-                    <th>Play Store URL</th>
-                    <td><a href="{{ ad.get(platform, {}).get('play_store_url', '') }}" target="_blank">{{ ad.get(platform, {}).get('play_store_url', '') }}</a></td>
-                </tr>
-                {% endif %}
-            </table>
-            <form id="post-button-{{ platform }}" style="display: inline;">
-                <button type="button" onclick="handlePostNow('{{ platform }}', '{{ ad_file }}')">Post Now</button>
-            </form>
-            <form id="reject-button-{{ platform }}" style="display: inline;">
-                <button type="submit">Reject</button>
-            </form>
-            <span id="post-time-{{ platform }}" data-post-time="{{ ad.get(platform, {}).get('post_time', '') }}">
-                {% if ad.get(platform, {}).get('post_time') %}
-                    Posted at: {{ ad.get(platform, {}).get('post_time') }}
-                {% endif %}
-            </span>
+    <div class="container">
+        <div class="header">
+            <h1 class="main-title">Social Media Campaign</h1>
+            <p class="subtitle">Review and manage your ad content across platforms</p>
         </div>
-        {% endif %}
-    {% endfor %}
-    <a href="/">Back to Home</a>
+
+        <div class="platforms-grid">
+
+            {% for platform in ['bluesky', 'twitter', 'facebook', 'instagram'] %}
+                {% if platform in ad %}
+                <div class="platform-card" data-platform="{{ platform }}">
+                    <div class="platform-header">
+                        <div class="platform-title">
+                            <div class="platform-icon">
+                                {% if platform == 'bluesky' %}
+                                    <i class="fab fa-twitter"></i>
+                                {% elif platform == 'twitter' %}
+                                    <i class="fab fa-twitter"></i>
+                                {% elif platform == 'facebook' %}
+                                    <i class="fab fa-facebook-f"></i>
+                                {% elif platform == 'instagram' %}
+                                    <i class="fab fa-instagram"></i>
+                                {% endif %}
+                            </div>
+                            {{ platform|title }}
+                        </div>
+                        <div class="status-indicator status-pending" id="status-{{ platform }}">
+                            <i class="fas fa-clock"></i>
+                            Pending
+                        </div>
+                    </div>
+
+                    <div class="content-grid">
+                        {% if ad.get(platform, {}).get('headline') %}
+                        <div class="content-item">
+                            <div class="content-label">
+                                <i class="fas fa-heading"></i>
+                                Headline
+                            </div>
+                            <div class="content-value">{{ ad.get(platform, {}).get('headline', '') }}</div>
+                        </div>
+                        {% endif %}
+
+                        {% if ad.get(platform, {}).get('body_text') %}
+                        <div class="content-item">
+                            <div class="content-label">
+                                <i class="fas fa-align-left"></i>
+                                Body Text
+                            </div>
+                            <div class="content-value">{{ ad.get(platform, {}).get('body_text', '') }}</div>
+                        </div>
+                        {% endif %}
+
+                        {% if ad.get(platform, {}).get('hashtags') %}
+                        <div class="content-item">
+                            <div class="content-label">
+                                <i class="fas fa-hashtag"></i>
+                                Hashtags
+                            </div>
+                            <div class="hashtags">
+                                {% for tag in ad.get(platform, {}).get('hashtags', []) %}
+                                    <span class="hashtag">#{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if ad.get(platform, {}).get('call_to_action') %}
+                        <div class="content-item">
+                            <div class="content-label">
+                                <i class="fas fa-bullhorn"></i>
+                                Call to Action
+                            </div>
+                            <div class="content-value">{{ ad.get(platform, {}).get('call_to_action', '') }}</div>
+                        </div>
+                        {% endif %}
+
+                        {% if ad.get(platform, {}).get('image_path') %}
+                        <div class="content-item">
+                            <div class="content-label">
+                                <i class="fas fa-image"></i>
+                                Ad Creative
+                            </div>
+                            <img src="/{{ ad.get(platform, {}).get('image_path', '') }}" 
+                                 alt="Ad Image for {{ platform|title }}" 
+                                 class="ad-image"
+                                 onclick="openImageModal('/{{ ad.get(platform, {}).get('image_path', '') }}')">
+                        </div>
+                        {% endif %}
+
+                        {% if ad.get(platform, {}).get('play_store_url') %}
+                        <div class="content-item">
+                            <div class="content-label">
+                                <i class="fab fa-google-play"></i>
+                                Play Store URL
+                            </div>
+                            <div class="content-value">
+                                <a href="{{ ad.get(platform, {}).get('play_store_url', '') }}" 
+                                   target="_blank" 
+                                   style="color: #667eea; text-decoration: none; font-weight: 500;">
+                                    {{ ad.get(platform, {}).get('play_store_url', '') }}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="action-buttons">
+                        <button id="post-button-{{ platform }}" 
+                                class="btn btn-post" 
+                                type="button" 
+                                onclick="handlePostNow('{{ platform }}', '{{ ad_file }}')">
+                            <i class="fas fa-share"></i>
+                            Post Now
+                        </button>
+                        <button id="reject-button-{{ platform }}" 
+                                class="btn btn-reject" 
+                                type="submit">
+                            <i class="fas fa-times"></i>
+                            Reject
+                        </button>
+                    </div>
+
+                    <div id="post-time-{{ platform }}" 
+                         class="post-status" 
+                         data-post-time="{{ ad.get(platform, {}).get('post_time', '') }}" 
+                         style="display: {% if ad.get(platform, {}).get('post_time') %}flex{% else %}none{% endif %};">
+                        {% if ad.get(platform, {}).get('post_time') %}
+                            <i class="fas fa-check-circle"></i>
+                            Posted at: {{ ad.get(platform, {}).get('post_time') }}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <a href="/" class="back-button" title="Back to Home">
+        <i class="fas fa-arrow-left"></i>
+    </a>
 </body>
 </html>
