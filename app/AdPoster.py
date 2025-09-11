@@ -21,27 +21,63 @@ class AdPoster:
 
     def post_ad(self, platform: str, image_path: str, body_text: str, app_url: str):
         """Post ad to specified platform"""
-        if platform == "facebook":
-            poster = FacebookPoster()
-            poster.post_image_and_comment(image_path, body_text, app_url=app_url)
-        elif platform == "twitter":
-            poster = TwitterPoster()
-            poster.post_text_and_link(body_text, app_url)
-        elif platform == "bluesky":
-            poster = BlueskyPoster()
-            poster.post_image(image_path, body_text, app_url)
-        elif platform == "instagram":
-            poster = InstagramPoster()
-            uploader = ImageKitUploader()
-            uploaded_url = uploader.upload_image(image_path, "uploaded_image.jpg", tags=["ads", "upload"])
-            if uploaded_url:
-                print("Image uploaded successfully. URL:", uploaded_url)
-                poster.post_image(uploaded_url, body_text)
+        import logging
+        
+        logging.info(f"AdPoster.post_ad() called - Platform: {platform}")
+        logging.info(f"Parameters: image_path={image_path}, body_text_length={len(body_text) if body_text else 0}, app_url={app_url}")
+        
+        try:
+            if platform == "facebook":
+                logging.info("Initializing FacebookPoster...")
+                poster = FacebookPoster()
+                logging.info(f"Calling FacebookPoster.post_image_and_comment() with image: {image_path}")
+                result = poster.post_image_and_comment(image_path, body_text, app_url=app_url)
+                logging.info(f"Facebook posting result: {result}")
+                
+            elif platform == "twitter":
+                logging.info("Initializing TwitterPoster...")
+                poster = TwitterPoster()
+                logging.info(f"Calling TwitterPoster.post_text_and_link() with text: {body_text[:50]}...")
+                result = poster.post_text_and_link(body_text, app_url)
+                logging.info(f"Twitter posting result: {result}")
+                
+            elif platform == "bluesky":
+                logging.info("Initializing BlueskyPoster...")
+                poster = BlueskyPoster()
+                logging.info(f"Calling BlueskyPoster.post_image() with image: {image_path}")
+                result = poster.post_image(image_path, body_text, app_url)
+                logging.info(f"BlueSky posting result: {result}")
+                
+            elif platform == "instagram":
+                logging.info("Initializing InstagramPoster and ImageKitUploader...")
+                poster = InstagramPoster()
+                uploader = ImageKitUploader()
+                
+                logging.info(f"Uploading image to ImageKit: {image_path}")
+                uploaded_url = uploader.upload_image(image_path, "uploaded_image.jpg", tags=["ads", "upload"])
+                
+                if uploaded_url:
+                    logging.info(f"Image uploaded successfully to ImageKit. URL: {uploaded_url}")
+                    result = poster.post_image(uploaded_url, body_text)
+                    logging.info(f"Instagram posting result: {result}")
+                else:
+                    error_msg = "Image upload to ImageKit failed"
+                    logging.error(error_msg)
+                    raise Exception(error_msg)
             else:
-                print("Image upload failed.")
-
-        else:
-            raise ValueError(f"Unsupported platform: {platform}")
+                error_msg = f"Unsupported platform: {platform}"
+                logging.error(error_msg)
+                raise ValueError(error_msg)
+                
+            logging.info(f"Successfully completed posting to {platform}")
+            
+        except Exception as e:
+            error_msg = f"Error posting to {platform}: {str(e)}"
+            logging.error(error_msg)
+            logging.error(f"Exception type: {type(e).__name__}")
+            logging.error(f"Exception details: {repr(e)}")
+            # Re-raise the exception so the web interface can handle it
+            raise e
         
     def post_to_all(self, ads_data: dict[str, AdContent]):
         """Post ads to all specified platforms"""

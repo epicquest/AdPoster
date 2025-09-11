@@ -464,18 +464,40 @@
                 // Show result
                 if (result.status === 'success') {
                     resultDisplay.classList.add('success');
-                    resultDisplay.innerHTML = `
-                        <h4>Ad Generation Requested!</h4>
+                    let successHTML = `
+                        <h4><i class="fas fa-check-circle"></i> Ad Generation Successful!</h4>
                         <p>${result.message}</p>
-                        <p><strong>App:</strong> ${result.data.app}</p>
-                        <p><strong>Platforms:</strong> ${result.data.platforms.join(', ')}</p>
-                        <p><strong>Generate Images:</strong> ${result.data.generate_images ? 'Yes' : 'No'}</p>
-                        ${result.data.custom_feature ? `<p><strong>Custom Feature:</strong> ${result.data.custom_feature}</p>` : ''}
+                        <div style="margin: 15px 0;">
+                            <p><strong>App:</strong> ${result.data.app}</p>
+                            <p><strong>Platforms:</strong> ${result.data.generated_platforms.join(', ')}</p>
+                            <p><strong>Images Generated:</strong> ${result.data.generate_images ? 'Yes' : 'No'}</p>
+                            ${result.data.custom_feature ? `<p><strong>Custom Feature:</strong> ${result.data.custom_feature}</p>` : ''}
+                            <p><strong>Ads Created:</strong> ${result.data.ads_generated}</p>
+                        </div>
                     `;
+                    
+                    // Show ad details if available
+                    if (result.data.ads_details) {
+                        successHTML += '<div style="margin-top: 20px;"><h5>Generated Ads Preview:</h5>';
+                        for (const [platform, details] of Object.entries(result.data.ads_details)) {
+                            successHTML += `
+                                <div style="margin: 10px 0; padding: 10px; border-left: 3px solid #4ecdc4; background: #f8f9ff;">
+                                    <strong>${platform.charAt(0).toUpperCase() + platform.slice(1)}:</strong><br>
+                                    <em>"${details.headline}"</em><br>
+                                    <small>${details.body_text}</small><br>
+                                    <small>📊 ${details.hashtags_count} hashtags | 🖼️ ${details.has_image ? 'Image included' : 'No image'}</small>
+                                </div>
+                            `;
+                        }
+                        successHTML += '</div>';
+                        successHTML += '<p style="margin-top: 15px;"><small>💡 Check the main dashboard to view and manage your generated ads.</small></p>';
+                    }
+                    
+                    resultDisplay.innerHTML = successHTML;
                 } else {
                     resultDisplay.classList.add('error');
                     resultDisplay.innerHTML = `
-                        <h4>Error</h4>
+                        <h4><i class="fas fa-exclamation-triangle"></i> Error</h4>
                         <p>${result.message || 'An error occurred while generating the ad.'}</p>
                     `;
                 }

@@ -5,6 +5,8 @@ import re
 import logging
 from datetime import datetime
 from config import APP_TEMPLATES, PLATFORM_SETTINGS
+from AdPoster import AdPoster
+from PosterGenerator import AppInfo
 
 app = Flask(__name__)
 
@@ -82,53 +84,43 @@ def home():
             total_platforms = len(platforms)
             creation_date = None
             
-            # Get app name from the content - improved extraction based on config.py
+            # Get app name from APP_TEMPLATES by matching content
             for platform in platforms:
                 platform_data = ad_data[platform]
                 
-                # First try to extract from Play Store URL
-                if 'play_store_url' in platform_data:
-                    play_store_url = platform_data['play_store_url']
-                    if 'darkstories' in play_store_url:
-                        app_name = "Dark Stories AI"
-                    elif 'illusionofmasteryandroid' in play_store_url:
-                        app_name = "Illusion of Mastery"
-                    elif 'oneoffive' in play_store_url:
-                        app_name = "Terra Nova"
-                    elif 'terranovaadventure' in play_store_url:
-                        app_name = "Terra Nova"
+                # Try to match app name from APP_TEMPLATES
+                if 'name' in platform_data and platform_data['name']:
+                    content_name = platform_data['name']
+                    # Check if this matches any app in APP_TEMPLATES
+                    for _, app_config in APP_TEMPLATES.items():
+                        if app_config['name'] == content_name:
+                            app_name = app_config['name']
+                            break
                 
-                # If not found from URL, extract from headline and body text
+                # If not found by name, try to match by play store URL
+                if not app_name and 'play_store_url' in platform_data:
+                    play_store_url = platform_data['play_store_url']
+                    for _, app_config in APP_TEMPLATES.items():
+                        if app_config['play_store_url'] in play_store_url or play_store_url in app_config['play_store_url']:
+                            app_name = app_config['name']
+                            break
+                
+                # If not found, try to match by keywords in headline/body text
                 if not app_name and 'headline' in platform_data:
                     headline = platform_data['headline']
                     body_text = platform_data.get('body_text', '')
+                    content = f"{headline} {body_text}".lower()
                     
-                    # Look for specific app names and keywords in content
-                    if 'Dark Stories' in headline or 'Dark Stories' in body_text:
-                        app_name = "Dark Stories AI"
-                    elif 'Terra Nova' in headline or 'Terra Nova' in body_text:
-                        app_name = "Terra Nova"
-                    elif 'Illusion of Mastery' in headline or 'Illusion of Mastery' in body_text:
-                        app_name = "Illusion of Mastery"
-                    elif ('Mystery' in headline or 'Mystery' in body_text) and ('AI' in headline or 'AI' in body_text):
-                        app_name = "Dark Stories AI"
-                    elif 'Space' in headline or 'Galaxy' in body_text or 'Spaceship' in body_text:
-                        app_name = "Terra Nova"
-                    elif 'Quiz' in headline or 'Quiz' in body_text or 'Knowledge' in body_text:
-                        app_name = "Illusion of Mastery"
-                    else:
-                        # Extract the main subject from headline
-                        if ':' in headline:
-                            app_name = headline.split(':')[0].strip()
-                        elif '!' in headline:
-                            app_name = headline.split('!')[0].strip()
-                        else:
-                            # Take first 3-4 words as app name
-                            words = headline.split()
-                            app_name = ' '.join(words[:3]) if len(words) >= 3 else headline
+                    for _, app_config in APP_TEMPLATES.items():
+                        app_config_name = app_config['name'].lower()
+                        # Check if app name appears in content
+                        if app_config_name in content:
+                            app_name = app_config['name']
+                            break
                 
                 if app_name:
                     break
+                
             
             # Count posted platforms
             for platform in platforms:
@@ -145,13 +137,10 @@ def home():
             
             images, platform_images = get_images_for_ad(file_name)
             
-            # Count images per platform
-            platform_image_counts = {
-                'facebook': 1 if platform_images.get('facebook', False) else 0,
-                'instagram': 1 if platform_images.get('instagram', False) else 0,
-                'twitter': 1 if platform_images.get('twitter', False) else 0,
-                'bluesky': 1 if platform_images.get('bluesky', False) else 0
-            }
+            # Count images per platform - use config for platform names
+            platform_image_counts = {}
+            for platform_key in PLATFORM_SETTINGS.keys():
+                platform_image_counts[platform_key] = 1 if platform_images.get(platform_key, False) else 0
             
             ads.append({
                 "file": file_name,
@@ -171,12 +160,9 @@ def home():
             logging.error(f"Error reading {file_name}: {e}")
             # Fallback to basic info
             images, platform_images = get_images_for_ad(file_name)
-            platform_image_counts = {
-                'facebook': 1 if platform_images.get('facebook', False) else 0,
-                'instagram': 1 if platform_images.get('instagram', False) else 0,
-                'twitter': 1 if platform_images.get('twitter', False) else 0,
-                'bluesky': 1 if platform_images.get('bluesky', False) else 0
-            }
+            platform_image_counts = {}
+            for platform_key in PLATFORM_SETTINGS.keys():
+                platform_image_counts[platform_key] = 1 if platform_images.get(platform_key, False) else 0
             ads.append({
                 "file": file_name,
                 "app_name": "Error loading",
@@ -191,7 +177,7 @@ def home():
                 "posting_status": "Error"
             })
     
-    return render_template('home.html', ads=ads, total_campaigns=len(ads))
+    return render_template('home.html', ads=ads, total_campaigns=len(ads), platform_settings=PLATFORM_SETTINGS)
 
 @app.route('/ad/<ad_file>')
 def view_ad(ad_file):
@@ -203,53 +189,42 @@ def view_ad(ad_file):
     with open(ad_path, 'r') as f:
         ad_data = json.load(f)
 
-    # Extract app name using the same logic as the home page
+    # Extract app name using APP_TEMPLATES
     app_name = None
     platforms = list(ad_data.keys())
     
     for platform in platforms:
         platform_data = ad_data[platform]
         
-        # First try to extract from Play Store URL
-        if 'play_store_url' in platform_data:
-            play_store_url = platform_data['play_store_url']
-            if 'darkstories' in play_store_url:
-                app_name = "Dark Stories AI"
-            elif 'illusionofmasteryandroid' in play_store_url:
-                app_name = "Illusion of Mastery"
-            elif 'oneoffive' in play_store_url:
-                app_name = "Terra Nova"
-            elif 'terranovaadventure' in play_store_url:
-                app_name = "Terra Nova"
+        # Try to match app name from APP_TEMPLATES
+        if 'name' in platform_data and platform_data['name']:
+            content_name = platform_data['name']
+            # Check if this matches any app in APP_TEMPLATES
+            for _, app_config in APP_TEMPLATES.items():
+                if app_config['name'] == content_name:
+                    app_name = app_config['name']
+                    break
         
-        # If not found from URL, extract from headline and body text
+        # If not found by name, try to match by play store URL
+        if not app_name and 'play_store_url' in platform_data:
+            play_store_url = platform_data['play_store_url']
+            for _, app_config in APP_TEMPLATES.items():
+                if app_config['play_store_url'] in play_store_url or play_store_url in app_config['play_store_url']:
+                    app_name = app_config['name']
+                    break
+        
+        # If not found, try to match by keywords in headline/body text
         if not app_name and 'headline' in platform_data:
             headline = platform_data['headline']
             body_text = platform_data.get('body_text', '')
+            content = f"{headline} {body_text}".lower()
             
-            # Look for specific app names and keywords in content
-            if 'Dark Stories' in headline or 'Dark Stories' in body_text:
-                app_name = "Dark Stories AI"
-            elif 'Terra Nova' in headline or 'Terra Nova' in body_text:
-                app_name = "Terra Nova"
-            elif 'Illusion of Mastery' in headline or 'Illusion of Mastery' in body_text:
-                app_name = "Illusion of Mastery"
-            elif ('Mystery' in headline or 'Mystery' in body_text) and ('AI' in headline or 'AI' in body_text):
-                app_name = "Dark Stories AI"
-            elif 'Space' in headline or 'Galaxy' in body_text or 'Spaceship' in body_text:
-                app_name = "Terra Nova"
-            elif 'Quiz' in headline or 'Quiz' in body_text or 'Knowledge' in body_text:
-                app_name = "Illusion of Mastery"
-            else:
-                # Extract the main subject from headline
-                if ':' in headline:
-                    app_name = headline.split(':')[0].strip()
-                elif '!' in headline:
-                    app_name = headline.split('!')[0].strip()
-                else:
-                    # Take first 3-4 words as app name
-                    words = headline.split()
-                    app_name = ' '.join(words[:3]) if len(words) >= 3 else headline
+            for _, app_config in APP_TEMPLATES.items():
+                app_config_name = app_config['name'].lower()
+                # Check if app name appears in content
+                if app_config_name in content:
+                    app_name = app_config['name']
+                    break
         
         if app_name:
             break
@@ -258,7 +233,7 @@ def view_ad(ad_file):
         app_name = "Unknown App"
 
     images = get_images_for_ad(ad_file)
-    response = make_response(render_template('ad_detail.html', ad=ad_data, ad_file=ad_file, images=images, app_name=app_name))
+    response = make_response(render_template('ad_detail.html', ad=ad_data, ad_file=ad_file, images=images, app_name=app_name, platform_settings=PLATFORM_SETTINGS))
     response.headers['Content-Type'] = 'text/html'
     return response
 
@@ -274,29 +249,6 @@ def reject_ad(ad_file):
     # Logic to mark the ad as rejected (e.g., update JSON or database)
     return jsonify({"status": "rejected", "ad_file": ad_file})
 
-@app.route('/ad/<ad_file>/<platform>/post', methods=['POST'])
-def post_ad(ad_file, platform):
-    """Handle the 'Post Now' action for a specific platform."""
-    ad_path = os.path.join(OUTPUT_DIR, ad_file)
-    if not os.path.exists(ad_path):
-        return jsonify({"status": "error", "message": "Ad not found"}), 404
-
-    with open(ad_path, 'r') as f:
-        ad_data = json.load(f)
-
-    # Add post time to the JSON data
-    post_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    if platform not in ad_data:
-        return jsonify({"status": "error", "message": "Platform not found in ad"}), 400
-
-    ad_data[platform]['post_time'] = post_time
-
-    # Save the updated JSON file
-    with open(ad_path, 'w') as f:
-        json.dump(ad_data, f, indent=4)
-
-    return jsonify({"status": "success", "post_time": post_time, "platform": platform})
-
 @app.route('/generate')
 def generate_ad_page():
     """Display the ad generation page."""
@@ -309,26 +261,299 @@ def generate_ad_page():
 @app.route('/generate', methods=['POST'])
 def generate_ad():
     """Handle ad generation form submission."""
-    # Get form data
-    selected_app = request.form.get('app_name')
-    selected_platforms = request.form.getlist('platforms')
-    generate_images = request.form.get('generate_images') == 'on'
-    custom_feature = request.form.get('custom_feature', '').strip()
-    
-    # For now, this is a fake implementation
-    # In the future, this would call the actual ad generation logic
-    result = {
-        "status": "success",
-        "message": "Ad generation is not yet implemented",
-        "data": {
-            "app": selected_app,
+    try:
+        # Get form data
+        selected_app_key = request.form.get('app_name')  # This is actually the app key
+        selected_platforms = request.form.getlist('platforms')
+        generate_images = request.form.get('generate_images') == 'on'
+        custom_feature = request.form.get('custom_feature', '').strip()
+        
+        # Validate input
+        if not selected_app_key:
+            return jsonify({
+                "status": "error",
+                "message": "Please select an app"
+            })
+        
+        if not selected_platforms:
+            return jsonify({
+                "status": "error",
+                "message": "Please select at least one platform"
+            })
+        
+        # Find the app template
+        if selected_app_key not in APP_TEMPLATES:
+            return jsonify({
+                "status": "error", 
+                "message": f"App template not found for key: {selected_app_key}"
+            })
+        
+        app_template = APP_TEMPLATES[selected_app_key].copy()
+        selected_app_name = app_template['name']
+        
+        # Add custom feature to the app template if provided
+        if custom_feature:
+            app_template['key_features'] = app_template.get('key_features', []).copy()
+            app_template['key_features'].append(custom_feature)
+        
+        # Create AppInfo object
+        app_info = AppInfo(**app_template)
+        
+        # Initialize AdPoster and generate ads
+        poster = AdPoster()
+        
+        logging.info(f"Starting ad generation for {selected_app_name} on platforms: {selected_platforms}")
+        
+        # Generate ads
+        ads_data = poster.generate_ads(app_info, selected_platforms, generate_images=generate_images)
+        
+        if not ads_data:
+            return jsonify({
+                "status": "error",
+                "message": "Failed to generate ads. Please check your API configuration."
+            })
+        
+        # Prepare response data
+        result_data = {
+            "app": selected_app_name,
             "platforms": selected_platforms,
             "generate_images": generate_images,
-            "custom_feature": custom_feature
+            "custom_feature": custom_feature,
+            "ads_generated": len(ads_data),
+            "generated_platforms": list(ads_data.keys())
         }
-    }
-    
-    return jsonify(result)
+        
+        # Add ad details if available
+        if ads_data:
+            result_data["ads_details"] = {}
+            for platform, ad_content in ads_data.items():
+                result_data["ads_details"][platform] = {
+                    "headline": ad_content.headline,
+                    "body_text": ad_content.body_text[:100] + "..." if len(ad_content.body_text) > 100 else ad_content.body_text,
+                    "hashtags_count": len(ad_content.hashtags),
+                    "has_image": bool(ad_content.image_path),
+                    "image_path": ad_content.image_path
+                }
+        
+        logging.info(f"Successfully generated ads for {len(ads_data)} platforms")
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Successfully generated ads for {len(ads_data)} platform(s)!",
+            "data": result_data
+        })
+        
+    except Exception as e:
+        logging.error(f"Error generating ads: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": f"An error occurred during ad generation: {str(e)}"
+        })
+
+@app.route('/ad/<ad_file>/<platform>/post', methods=['POST'])
+def post_ad_to_platform(ad_file, platform):
+    """Handle posting an ad to a specific platform."""
+    try:
+        # Load the ad data from the JSON file
+        ad_path = os.path.join(OUTPUT_DIR, ad_file)
+        
+        if not os.path.exists(ad_path):
+            return jsonify({
+                "status": "error",
+                "message": f"Ad file {ad_file} not found"
+            })
+        
+        with open(ad_path, 'r') as f:
+            ad_data = json.load(f)
+        
+        # Check if the platform exists in the ad data
+        if platform not in ad_data:
+            return jsonify({
+                "status": "error",
+                "message": f"Platform {platform} not found in ad data"
+            })
+        
+        platform_data = ad_data[platform]
+        
+        # Get the required data for posting
+        body_text = platform_data.get('body_text', '')
+        app_url = platform_data.get('play_store_url', '')
+        image_path = platform_data.get('image_path', '')
+        
+        # Validate required data
+        if not body_text:
+            return jsonify({
+                "status": "error",
+                "message": "No body text found for this platform"
+            })
+        
+        # Check if image exists if image_path is provided
+        if image_path:
+            # Handle relative paths - convert to absolute path
+            if not image_path.startswith('/'):
+                # Remove 'output/' prefix if present in the stored path
+                if image_path.startswith('output/'):
+                    image_filename = image_path[7:]  # Remove 'output/' prefix
+                else:
+                    image_filename = image_path
+                full_image_path = os.path.join(OUTPUT_DIR, image_filename)
+            else:
+                full_image_path = image_path
+            
+            if not os.path.exists(full_image_path):
+                logging.warning(f"Image file not found: {full_image_path}, posting without image")
+                image_path = None
+            else:
+                image_path = full_image_path
+                logging.info(f"Using image: {image_path}")
+        
+        # Initialize AdPoster and post the ad
+        poster = AdPoster()
+        
+        logging.info(f"Starting post process for {platform}: {body_text[:50]}...")
+        
+        # Create progress tracking
+        progress_steps = []
+        
+        try:
+            # Step 1: Initialize platform connection
+            progress_steps.append(f"🔗 Connecting to {platform.title()} API...")
+            logging.info(f"Step 1: Initializing {platform} connection")
+            
+            # Step 2: Prepare content
+            progress_steps.append("📝 Preparing ad content and validating data...")
+            logging.info(f"Step 2: Preparing content - Body: {len(body_text)} chars, Image: {'Yes' if image_path else 'No'}")
+            
+            # Step 3: Platform-specific preparation
+            if platform == "instagram":
+                progress_steps.append("📤 Uploading image to ImageKit service...")
+            elif platform == "facebook":
+                progress_steps.append("🖼️ Processing image for Facebook posting...")
+            elif platform == "twitter":
+                progress_steps.append("🐦 Formatting content for Twitter constraints...")
+            elif platform == "bluesky":
+                progress_steps.append("☁️ Preparing content for BlueSky network...")
+            else:
+                progress_steps.append(f"⚙️ Configuring {platform.title()} posting parameters...")
+            
+            # Step 4: Upload image (if applicable)
+            if image_path:
+                progress_steps.append(f"🖼️ Processing and uploading image ({image_path.split('/')[-1]})...")
+                logging.info(f"Step 4: Processing image: {image_path}")
+            
+            # Step 5: Post to platform
+            progress_steps.append(f"🚀 Publishing to {platform.title()}...")
+            logging.info(f"Step 5: Calling post_ad method for {platform}")
+            logging.debug(f"Posting parameters: platform={platform}, image_path={image_path}, body_text_length={len(body_text)}, app_url={app_url}")
+            
+            # Call the post_ad method with detailed error tracking
+            try:
+                poster.post_ad(platform, image_path, body_text, app_url)
+                logging.info(f"post_ad method completed successfully for {platform}")
+            except Exception as post_ad_error:
+                error_details = {
+                    'error_type': type(post_ad_error).__name__,
+                    'error_message': str(post_ad_error),
+                    'platform': platform,
+                    'has_image': bool(image_path),
+                    'image_path': image_path if image_path else 'None',
+                    'body_text_length': len(body_text),
+                    'app_url': app_url
+                }
+                logging.error(f"Detailed error in post_ad: {error_details}")
+                
+                # Add specific error information to progress
+                progress_steps.append(f"❌ Posting failed: {error_details['error_type']} - {error_details['error_message']}")
+                
+                # Update ad data with error information
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                ad_data[platform]['post_time'] = current_time
+                ad_data[platform]['posting_progress'] = progress_steps
+                ad_data[platform]['posting_status'] = 'failed'
+                ad_data[platform]['error_details'] = error_details
+                
+                # Save error information to file
+                with open(ad_path, 'w', encoding='utf-8') as f:
+                    json.dump(ad_data, f, indent=2, ensure_ascii=False)
+                
+                return jsonify({
+                    "status": "error",
+                    "message": f"Failed to post to {platform.title()}: {error_details['error_message']}",
+                    "error_type": error_details['error_type'],
+                    "progress_steps": progress_steps,
+                    "error_details": error_details
+                })
+            
+            # Step 6: Verify posting
+            progress_steps.append("✅ Verifying successful publication...")
+            logging.info(f"Step 6: Post completed successfully for {platform}")
+            
+            # Step 7: Update records
+            progress_steps.append("💾 Updating campaign records and analytics...")
+            logging.info(f"Step 7: Updating ad data with timestamp")
+            
+            # Step 8: Final confirmation
+            progress_steps.append(f"🎉 Successfully posted to {platform.title()}!")
+            
+        except Exception as post_error:
+            error_msg = str(post_error)
+            error_type = type(post_error).__name__
+            logging.error(f"Outer exception in post_ad_to_platform: {error_type} - {error_msg}")
+            progress_steps.append(f"❌ Unexpected error: {error_type} - {error_msg}")
+            
+            # Update ad data with error information
+            current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            ad_data[platform]['post_time'] = current_time
+            ad_data[platform]['posting_progress'] = progress_steps
+            ad_data[platform]['posting_status'] = 'failed'
+            ad_data[platform]['error_details'] = {
+                'error_type': error_type,
+                'error_message': error_msg,
+                'platform': platform
+            }
+            
+            # Save error information to file
+            with open(ad_path, 'w', encoding='utf-8') as f:
+                json.dump(ad_data, f, indent=2, ensure_ascii=False)
+            
+            return jsonify({
+                "status": "error",
+                "message": f"Unexpected error posting to {platform}: {error_msg}",
+                "error_type": error_type,
+                "progress_steps": progress_steps
+            })
+        
+        # Update the ad data with post time and progress info
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ad_data[platform]['post_time'] = current_time
+        ad_data[platform]['posting_progress'] = progress_steps
+        ad_data[platform]['posting_status'] = 'completed'
+        
+        # Save the updated ad data back to the file
+        with open(ad_path, 'w', encoding='utf-8') as f:
+            json.dump(ad_data, f, indent=2, ensure_ascii=False)
+        
+        logging.info(f"Successfully completed posting process to {platform}")
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Successfully posted to {platform.title()}!",
+            "post_time": current_time,
+            "progress_steps": progress_steps,
+            "platform_details": {
+                "name": platform.title(),
+                "content_length": len(body_text),
+                "has_image": bool(image_path),
+                "image_path": image_path.split('/')[-1] if image_path else None
+            }
+        })
+        
+    except Exception as e:
+        logging.error(f"Error posting ad to {platform}: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to post to {platform}: {str(e)}"
+        })
 
 @app.route('/output/<path:filename>')
 def serve_output_file(filename):

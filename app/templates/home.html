@@ -360,6 +360,16 @@
             color: white;
         }
 
+        .platform-badge[data-platform="linkedin"] {
+            background: linear-gradient(135deg, #0077b5, #005885);
+            color: white;
+        }
+
+        .platform-badge[data-platform="tiktok"] {
+            background: linear-gradient(135deg, #ff0050, #000000);
+            color: white;
+        }
+
         .platform-badge:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
@@ -520,29 +530,37 @@
                             </div>
                             <div class="platform-icons">
                                 {% for platform in ad.platforms %}
-                                <div class="platform-badge {% if ad.platform_image_counts.get(platform, False) %}has-image{% else %}no-image{% endif %}" data-platform="{{ platform }}">
-                                    <div class="platform-info">
-                                        <div class="platform-icon-wrapper">
-                                            {% if platform == 'facebook' %}
-                                                <i class="fab fa-facebook-f"></i>
-                                            {% elif platform == 'twitter' %}
-                                                <i class="fab fa-twitter"></i>
-                                            {% elif platform == 'instagram' %}
-                                                <i class="fab fa-instagram"></i>
-                                            {% elif platform == 'bluesky' %}
-                                                <i class="fas fa-cloud"></i>
-                                            {% endif %}
+                                    {% if platform in platform_settings %}
+                                    <div class="platform-badge {% if ad.platform_image_counts.get(platform, False) %}has-image{% else %}no-image{% endif %}" data-platform="{{ platform }}">
+                                        <div class="platform-info">
+                                            <div class="platform-icon-wrapper">
+                                                {% if platform == 'facebook' %}
+                                                    <i class="fab fa-facebook-f"></i>
+                                                {% elif platform == 'twitter' %}
+                                                    <i class="fab fa-twitter"></i>
+                                                {% elif platform == 'instagram' %}
+                                                    <i class="fab fa-instagram"></i>
+                                                {% elif platform == 'bluesky' %}
+                                                    <i class="fas fa-cloud"></i>
+                                                {% elif platform == 'linkedin' %}
+                                                    <i class="fab fa-linkedin-in"></i>
+                                                {% elif platform == 'tiktok' %}
+                                                    <i class="fab fa-tiktok"></i>
+                                                {% else %}
+                                                    <i class="fas fa-share-alt"></i>
+                                                {% endif %}
+                                            </div>
+                                            <span class="platform-name">{{ platform|title }}</span>
                                         </div>
-                                        <span class="platform-name">{{ platform|title }}</span>
-                                    </div>
-                                    <div class="image-indicator">
-                                        {% if ad.platform_image_counts.get(platform, False) %}
-                                            <i class="fas fa-image" title="Image available"></i>
+                                        <div class="image-indicator">
+                                            {% if ad.platform_image_counts.get(platform, False) %}
+                                                <i class="fas fa-image" title="Image available"></i>
                                         {% else %}
                                             <i class="fas fa-image-slash" title="No image"></i>
                                         {% endif %}
                                     </div>
                                 </div>
+                                    {% endif %}
                                 {% endfor %}
                             </div>
                         </div>

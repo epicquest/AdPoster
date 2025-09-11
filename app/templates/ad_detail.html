@@ -13,9 +13,30 @@
             const postTimeElement = document.getElementById(`post-time-${platform}`);
             const statusCard = document.querySelector(`[data-platform="${platform}"] .status-indicator`);
 
-            // Add loading state
+            // Add loading state with progress
             postButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
             postButton.disabled = true;
+            
+            // Create progress display
+            const progressContainer = document.createElement('div');
+            progressContainer.className = 'posting-progress';
+            progressContainer.id = `progress-${platform}`;
+            progressContainer.innerHTML = `
+                <div class="progress-header">
+                    <i class="fas fa-rocket"></i>
+                    <span>Posting to ${platform.charAt(0).toUpperCase() + platform.slice(1)}...</span>
+                </div>
+                <div class="progress-steps" id="progress-steps-${platform}">
+                    <div class="progress-step active">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Initializing...</span>
+                    </div>
+                </div>
+            `;
+            
+            // Insert progress container after the action buttons
+            const actionButtons = postButton.closest('.action-buttons');
+            actionButtons.insertAdjacentElement('afterend', progressContainer);
 
             fetch(`/ad/${adFile}/${platform}/post`, {
                 method: 'POST',
@@ -23,22 +44,93 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    postButton.style.display = 'none';
-                    rejectButton.style.display = 'none';
-                    postTimeElement.innerHTML = `<i class="fas fa-check-circle"></i> Posted at: ${data.post_time}`;
-                    statusCard.className = 'status-indicator status-posted';
-                    statusCard.innerHTML = '<i class="fas fa-check-circle"></i> Posted';
+                    // Update progress with completion steps
+                    const progressSteps = document.getElementById(`progress-steps-${platform}`);
+                    progressSteps.innerHTML = '';
+                    
+                    data.progress_steps.forEach((step, index) => {
+                        const stepElement = document.createElement('div');
+                        stepElement.className = 'progress-step completed';
+                        stepElement.innerHTML = `
+                            <i class="fas fa-check-circle"></i>
+                            <span>${step}</span>
+                        `;
+                        progressSteps.appendChild(stepElement);
+                        
+                        // Animate steps appearing
+                        setTimeout(() => {
+                            stepElement.style.opacity = '1';
+                            stepElement.style.transform = 'translateX(0)';
+                        }, index * 200);
+                    });
+                    
+                    // Hide buttons and show success
+                    setTimeout(() => {
+                        postButton.style.display = 'none';
+                        rejectButton.style.display = 'none';
+                        postTimeElement.innerHTML = `<i class="fas fa-check-circle"></i> Posted at: ${data.post_time}`;
+                        postTimeElement.style.display = 'flex';
+                        statusCard.className = 'status-indicator status-posted';
+                        statusCard.innerHTML = '<i class="fas fa-check-circle"></i> Posted';
+                        
+                        // Show detailed success info
+                        if (data.platform_details) {
+                            const detailsHtml = `
+                                <div class="posting-details">
+                                    <h5><i class="fas fa-info-circle"></i> Posting Details</h5>
+                                    <p><strong>Platform:</strong> ${data.platform_details.name}</p>
+                                    <p><strong>Content Length:</strong> ${data.platform_details.content_length} characters</p>
+                                    <p><strong>Image:</strong> ${data.platform_details.has_image ? '✅ Included' : '❌ None'}</p>
+                                    ${data.platform_details.image_path ? `<p><strong>Image File:</strong> ${data.platform_details.image_path}</p>` : ''}
+                                    <p><strong>Status:</strong> <span class="success-badge">Successfully Posted</span></p>
+                                </div>
+                            `;
+                            progressContainer.innerHTML += detailsHtml;
+                        }
+                    }, data.progress_steps.length * 200 + 500);
+                    
                 } else {
+                    // Show error in progress
+                    const progressSteps = document.getElementById(`progress-steps-${platform}`);
+                    const errorStep = document.createElement('div');
+                    errorStep.className = 'progress-step error';
+                    errorStep.innerHTML = `
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Error: ${data.message}</span>
+                    `;
+                    progressSteps.appendChild(errorStep);
+                    
                     showNotification(data.message || 'An error occurred.', 'error');
                     postButton.innerHTML = '<i class="fas fa-share"></i> Post Now';
                     postButton.disabled = false;
+                    
+                    // Remove progress after delay
+                    setTimeout(() => {
+                        progressContainer.remove();
+                    }, 3000);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
+                
+                // Show network error in progress
+                const progressSteps = document.getElementById(`progress-steps-${platform}`);
+                const errorStep = document.createElement('div');
+                errorStep.className = 'progress-step error';
+                errorStep.innerHTML = `
+                    <i class="fas fa-wifi"></i>
+                    <span>Network error occurred</span>
+                `;
+                progressSteps.appendChild(errorStep);
+                
                 showNotification('An error occurred while posting.', 'error');
                 postButton.innerHTML = '<i class="fas fa-share"></i> Post Now';
                 postButton.disabled = false;
+                
+                // Remove progress after delay
+                setTimeout(() => {
+                    progressContainer.remove();
+                }, 3000);
             });
         }
 
@@ -62,12 +154,16 @@
         }
 
         function initializeButtons() {
-            const platforms = ['bluesky', 'twitter', 'facebook', 'instagram'];
+            const platforms = {{ platform_settings.keys() | list | tojson }};
             platforms.forEach(platform => {
-                const postTime = document.getElementById(`post-time-${platform}`).dataset.postTime;
+                const postTimeElement = document.getElementById(`post-time-${platform}`);
                 const postButton = document.getElementById(`post-button-${platform}`);
                 const rejectButton = document.getElementById(`reject-button-${platform}`);
                 const statusCard = document.querySelector(`[data-platform="${platform}"] .status-indicator`);
+                
+                if (!postTimeElement || !postButton || !statusCard) return;
+                
+                const postTime = postTimeElement.dataset.postTime;
 
                 if (postTime) {
                     postButton.style.display = 'none';
@@ -228,6 +324,14 @@
 
         .platform-card[data-platform="instagram"] {
             --platform-color: linear-gradient(90deg, #E4405F, #FCAF45, #833AB4);
+        }
+
+        .platform-card[data-platform="linkedin"] {
+            --platform-color: linear-gradient(90deg, #0077b5, #005885);
+        }
+
+        .platform-card[data-platform="tiktok"] {
+            --platform-color: linear-gradient(90deg, #ff0050, #000000);
         }
 
         @keyframes slideInUp {
@@ -543,6 +647,113 @@
             background: linear-gradient(135deg, #00b894, #00a085);
         }
 
+        .posting-progress {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            animation: slideInUp 0.3s ease-out;
+        }
+
+        .progress-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .progress-header i {
+            color: #667eea;
+            animation: rocket 2s infinite ease-in-out;
+        }
+
+        @keyframes rocket {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(-5deg); }
+            75% { transform: translateY(-2px) rotate(5deg); }
+        }
+
+        .progress-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .progress-step.active {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .progress-step.completed {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .progress-step.error {
+            background: linear-gradient(135deg, #e17055, #d63031);
+            color: white;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .progress-step i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .progress-step span {
+            font-weight: 500;
+        }
+
+        .posting-details {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #00b894;
+        }
+
+        .posting-details h5 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .posting-details p {
+            margin: 5px 0;
+            color: #495057;
+        }
+
+        .success-badge {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
         @media (max-width: 768px) {
             .platforms-grid {
                 grid-template-columns: 1fr;
@@ -589,20 +800,26 @@
 
         <div class="platforms-grid">
 
-            {% for platform in ['bluesky', 'twitter', 'facebook', 'instagram'] %}
+            {% for platform in platform_settings.keys() %}
                 {% if platform in ad %}
                 <div class="platform-card" data-platform="{{ platform }}">
                     <div class="platform-header">
                         <div class="platform-title">
                             <div class="platform-icon">
                                 {% if platform == 'bluesky' %}
-                                    <i class="fab fa-twitter"></i>
+                                    <i class="fas fa-cloud"></i>
                                 {% elif platform == 'twitter' %}
                                     <i class="fab fa-twitter"></i>
                                 {% elif platform == 'facebook' %}
                                     <i class="fab fa-facebook-f"></i>
                                 {% elif platform == 'instagram' %}
                                     <i class="fab fa-instagram"></i>
+                                {% elif platform == 'linkedin' %}
+                                    <i class="fab fa-linkedin-in"></i>
+                                {% elif platform == 'tiktok' %}
+                                    <i class="fab fa-tiktok"></i>
+                                {% else %}
+                                    <i class="fas fa-share-alt"></i>
                                 {% endif %}
                             </div>
                             {{ platform|title }}
@@ -664,10 +881,11 @@
                                 <i class="fas fa-image"></i>
                                 Ad Creative
                             </div>
-                            <img src="/{{ ad.get(platform, {}).get('image_path', '') }}" 
+                            {% set image_filename = ad.get(platform, {}).get('image_path', '').split('/')[-1] %}
+                            <img src="/output/{{ image_filename }}" 
                                  alt="Ad Image for {{ platform|title }}" 
                                  class="ad-image"
-                                 onclick="openImageModal('/{{ ad.get(platform, {}).get('image_path', '') }}')">
+                                 onclick="openImageModal('/output/{{ image_filename }}')">
                         </div>
                         {% endif %}
 
