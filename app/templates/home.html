@@ -463,6 +463,58 @@
                 gap: 8px;
             }
         }
+
+        /* Apps Section Styles */
+        .apps-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .app-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .app-category {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .app-description {
+            color: #34495e;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
     </style>
 
     <div class="container">
@@ -473,6 +525,10 @@
                 <a href="/generate" class="generate-btn">
                     <i class="fas fa-plus"></i>
                     Generate New Ad
+                </a>
+                <a href="{{ url_for('list_apps') }}" class="generate-btn" style="background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);">
+                    <i class="fas fa-mobile-alt"></i>
+                    Manage Apps
                 </a>
             </div>
         </div>
@@ -587,6 +643,36 @@
                 <div class="empty-title">No campaigns found</div>
                 <div class="empty-description">Start creating your first social media campaign to see it here.</div>
             </div>
+            {% endif %}
+        </div>
+
+        <!-- Apps Section -->
+        <div class="apps-container" style="margin-top: 50px;">
+            <h2 class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                Available Apps ({{ app_templates|length }})
+            </h2>
+
+            {% if app_templates %}
+                <div class="apps-grid">
+                    {% for app_key, app in app_templates.items() %}
+                        <div class="app-card">
+                            <div class="app-name">{{ app.name }}</div>
+                            <div class="app-category">{{ app.category }}</div>
+                            <div class="app-description">{{ app.description[:100] }}{% if app.description|length > 100 %}...{% endif %}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="empty-title">No apps configured</div>
+                    <div class="empty-description">Add app templates to start generating ads.</div>
+                </div>
             {% endif %}
         </div>
     </div>

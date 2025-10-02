@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if action == 'edit' %}Edit{% else %}Add{% endif %} App - AdPoster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            border-radius: 2px;
+        }
+
+        .main-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+        .form-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control.textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .key-features {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feature-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .feature-input input {
+            flex: 1;
+        }
+
+        .add-feature-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .add-feature-btn:hover {
+            background: #5a67d8;
+        }
+
+        .remove-feature-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s ease;
+        }
+
+        .remove-feature-btn:hover {
+            background: #c0392b;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e1e8ed;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .required {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('list_apps') }}" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Apps
+        </a>
+
+        <div class="header">
+            <h1 class="main-title">
+                {% if action == 'edit' %}
+                    <i class="fas fa-edit"></i> Edit App
+                {% else %}
+                    <i class="fas fa-plus"></i> Add New App
+                {% endif %}
+            </h1>
+            <p class="subtitle">
+                {% if action == 'edit' %}
+                    Update the details for {{ app.name }}
+                {% else %}
+                    Create a new app template for ad generation
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="form-container">
+            <form method="POST" id="appForm">
+                {% if action == 'edit' %}
+                    <input type="hidden" name="app_key" value="{{ app_key }}">
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="app_key" class="form-label">
+                        App Key <span class="required">*</span>
+                    </label>
+                    <input type="text" id="app_key" name="app_key" class="form-control"
+                           value="{% if action == 'edit' %}{{ app_key }}{% endif %}"
+                           {% if action == 'edit' %}readonly{% endif %} required>
+                    <div class="help-text">Unique identifier for the app (used in filenames)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="name" class="form-label">
+                        App Name <span class="required">*</span>
+                    </label>
+                    <input type="text" id="name" name="name" class="form-control"
+                           value="{% if app %}{{ app.name }}{% endif %}" required>
+                    <div class="help-text">Display name of the application</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="category" class="form-label">
+                        Category <span class="required">*</span>
+                    </label>
+                    <input type="text" id="category" name="category" class="form-control"
+                           value="{% if app %}{{ app.category }}{% endif %}" required>
+                    <div class="help-text">App category (e.g., Education, Entertainment, Games)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">
+                        Description <span class="required">*</span>
+                    </label>
+                    <textarea id="description" name="description" class="form-control textarea" required>{% if app %}{{ app.description }}{% endif %}</textarea>
+                    <div class="help-text">Detailed description of the app for ad generation</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">
+                        Key Features
+                    </label>
+                    <div class="key-features" id="keyFeatures">
+                        {% if app and app.key_features %}
+                            {% for feature in app.key_features %}
+                                <div class="feature-input">
+                                    <input type="text" name="key_features" class="form-control" value="{{ feature }}" placeholder="Enter a key feature">
+                                    <button type="button" class="remove-feature-btn" onclick="removeFeature(this)">×</button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="feature-input">
+                            <input type="text" name="key_features" class="form-control" placeholder="Enter a key feature">
+                            <button type="button" class="remove-feature-btn" onclick="removeFeature(this)">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-feature-btn" onclick="addFeature()">
+                        <i class="fas fa-plus"></i> Add Feature
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="game_guide" class="form-label">
+                        Game Guide
+                    </label>
+                    <textarea id="game_guide" name="game_guide" class="form-control textarea">{% if app %}{{ app.game_guide }}{% endif %}</textarea>
+                    <div class="help-text">Instructions or guide for the app/game</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="target_audience" class="form-label">
+                        Target Audience <span class="required">*</span>
+                    </label>
+                    <input type="text" id="target_audience" name="target_audience" class="form-control"
+                           value="{% if app %}{{ app.target_audience }}{% endif %}" required>
+                    <div class="help-text">Who is the app intended for (e.g., "Gamers aged 13-60")</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="play_store_url" class="form-label">
+                        Play Store URL <span class="required">*</span>
+                    </label>
+                    <input type="url" id="play_store_url" name="play_store_url" class="form-control"
+                           value="{% if app %}{{ app.play_store_url }}{% endif %}" required>
+                    <div class="help-text">Google Play Store link for the app</div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('list_apps') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        {% if action == 'edit' %}Update App{% else %}Create App{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function addFeature() {
+            const featuresContainer = document.getElementById('keyFeatures');
+            const featureInput = document.createElement('div');
+            featureInput.className = 'feature-input';
+            featureInput.innerHTML = `
+                <input type="text" name="key_features" class="form-control" placeholder="Enter a key feature">
+                <button type="button" class="remove-feature-btn" onclick="removeFeature(this)">×</button>
+            `;
+            featuresContainer.appendChild(featureInput);
+        }
+
+        function removeFeature(button) {
+            const featureInput = button.parentElement;
+            const featuresContainer = document.getElementById('keyFeatures');
+            if (featuresContainer.children.length > 1) {
+                featureInput.remove();
+            } else {
+                // Clear the input instead of removing the last one
+                featureInput.querySelector('input').value = '';
+            }
+        }
+
+        // Auto-generate app key from name if adding new app
+        {% if action == 'add' %}
+        document.getElementById('name').addEventListener('input', function() {
+            const name = this.value;
+            const key = name.toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+                .replace(/\s+/g, '_') // Replace spaces with underscores
+                .replace(/_+/g, '_') // Replace multiple underscores with single
+                .replace(/^_|_$/g, ''); // Remove leading/trailing underscores
+            document.getElementById('app_key').value = key;
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

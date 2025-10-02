@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, send_from_directory, make_response
+from flask import Flask, render_template, jsonify, request, send_from_directory, make_response, redirect, url_for
 import os
 import json
 import re
@@ -177,7 +177,7 @@ def home():
                 "posting_status": "Error"
             })
     
-    return render_template('home.html', ads=ads, total_campaigns=len(ads), platform_settings=PLATFORM_SETTINGS)
+    return render_template('home.html', ads=ads, total_campaigns=len(ads), platform_settings=PLATFORM_SETTINGS, app_templates=APP_TEMPLATES)
 
 @app.route('/ad/<ad_file>')
 def view_ad(ad_file):
@@ -559,6 +559,87 @@ def post_ad_to_platform(ad_file, platform):
 def serve_output_file(filename):
     """Serve files from the output directory."""
     return send_from_directory(OUTPUT_DIR, filename)
+
+# App Management Routes
+INPUT_DIR = os.path.join(os.path.dirname(__file__), '../input')
+
+@app.route('/apps')
+def list_apps():
+    """Display list of available apps."""
+    return render_template('apps.html', app_templates=APP_TEMPLATES)
+
+@app.route('/apps/add', methods=['GET', 'POST'])
+def add_app():
+    """Add a new app."""
+    if request.method == 'POST':
+        app_key = request.form.get('app_key')
+        app_data = {
+            'name': request.form.get('name'),
+            'description': request.form.get('description'),
+            'category': request.form.get('category'),
+            'key_features': request.form.getlist('key_features'),
+            'game_guide': request.form.get('game_guide'),
+            'target_audience': request.form.get('target_audience'),
+            'play_store_url': request.form.get('play_store_url')
+        }
+        
+        # Save to JSON file
+        json_path = os.path.join(INPUT_DIR, f"{app_key}.json")
+        with open(json_path, 'w') as f:
+            json.dump(app_data, f, indent=2)
+        
+        # Reload APP_TEMPLATES
+        global APP_TEMPLATES
+        APP_TEMPLATES[app_key] = app_data
+        
+        return redirect(url_for('list_apps'))
+    
+    return render_template('app_form.html', action='add', app=None)
+
+@app.route('/apps/<app_key>/edit', methods=['GET', 'POST'])
+def edit_app(app_key):
+    """Edit an existing app."""
+    if request.method == 'POST':
+        app_data = {
+            'name': request.form.get('name'),
+            'description': request.form.get('description'),
+            'category': request.form.get('category'),
+            'key_features': request.form.getlist('key_features'),
+            'game_guide': request.form.get('game_guide'),
+            'target_audience': request.form.get('target_audience'),
+            'play_store_url': request.form.get('play_store_url')
+        }
+        
+        # Save to JSON file
+        json_path = os.path.join(INPUT_DIR, f"{app_key}.json")
+        with open(json_path, 'w') as f:
+            json.dump(app_data, f, indent=2)
+        
+        # Reload APP_TEMPLATES
+        global APP_TEMPLATES
+        APP_TEMPLATES[app_key] = app_data
+        
+        return redirect(url_for('list_apps'))
+    
+    app = APP_TEMPLATES.get(app_key)
+    if not app:
+        return "App not found", 404
+    
+    return render_template('app_form.html', action='edit', app=app, app_key=app_key)
+
+@app.route('/apps/<app_key>/delete', methods=['POST'])
+def delete_app(app_key):
+    """Delete an app."""
+    json_path = os.path.join(INPUT_DIR, f"{app_key}.json")
+    if os.path.exists(json_path):
+        os.remove(json_path)
+    
+    # Remove from APP_TEMPLATES
+    global APP_TEMPLATES
+    if app_key in APP_TEMPLATES:
+        del APP_TEMPLATES[app_key]
+    
+    return redirect(url_for('list_apps'))
 
 if __name__ == '__main__':
     app.run(debug=True)

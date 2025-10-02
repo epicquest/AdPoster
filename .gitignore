@@ -18,3 +18,4 @@
 /app/instagram_api/__pycache__/instagram_poster.cpython-312.pyc
 /app/reddit/reddit_research_results_20250829_181339.json
 /app/twitter_api/__pycache__/twitter_poster.cpython-312.pyc
+/.env
