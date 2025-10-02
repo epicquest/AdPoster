@@ -5,14 +5,13 @@ import logging
 
 load_dotenv()
 
-PAGE_ID = os.getenv('FB_PAGE_ID')
-ACCESS_TOKEN = os.getenv('FB_ACCESS_TOKEN')
+from ..config import FB_PAGE_ID, FB_ACCESS_TOKEN
 
 # Configure logging for FacebookPoster
 logger = logging.getLogger(__name__)
 
 class FacebookPoster:
-    def __init__(self, page_id=PAGE_ID, access_token=ACCESS_TOKEN):
+    def __init__(self, page_id=FB_PAGE_ID, access_token=FB_ACCESS_TOKEN):
         self.page_id = page_id
         self.access_token = access_token
         logger.info(f"FacebookPoster initialized with page_id: {bool(self.page_id)}, access_token: {bool(self.access_token)}")

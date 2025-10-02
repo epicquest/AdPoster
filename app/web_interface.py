@@ -1,14 +1,15 @@
-from flask import Flask, render_template, jsonify, request, send_from_directory, make_response, redirect, url_for
+from flask import Flask, render_template, jsonify, request, send_from_directory, make_response, redirect, url_for, flash
 import os
 import json
 import re
 import logging
 from datetime import datetime
-from config import APP_TEMPLATES, PLATFORM_SETTINGS
-from AdPoster import AdPoster
-from PosterGenerator import AppInfo
+from .config import APP_TEMPLATES, PLATFORM_SETTINGS, CONFIG, save_config
+from .AdPoster import AdPoster
+from .PosterGenerator import AppInfo
 
 app = Flask(__name__)
+app.secret_key = 'adposter-secret-key-2025'  # Required for flash messages
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -640,6 +641,57 @@ def delete_app(app_key):
         del APP_TEMPLATES[app_key]
     
     return redirect(url_for('list_apps'))
+
+@app.route('/config')
+def config_page():
+    """Configuration page"""
+    return render_template('config.html', config=CONFIG)
+
+@app.route('/config', methods=['POST'])
+def save_configuration():
+    """Save configuration"""
+    # Get form data
+    config_data = {
+        'ai_model': request.form.get('ai_model', 'gemini-2.0-flash-lite'),
+        'ai_model_lite': request.form.get('ai_model_lite', 'gemini-2.0-flash-lite'),
+        'ai_model_full': request.form.get('ai_model_full', 'gemini-2.0-flash-001'),
+        'ai_model2': request.form.get('ai_model2', 'gemini-2.5-flash-preview-04-17'),
+        'google_api_key': request.form.get('google_api_key', ''),
+        'image_ai_model': request.form.get('image_ai_model', 'gemini-2.0-flash'),
+        'reddit_client_id': request.form.get('reddit_client_id', ''),
+        'reddit_client_secret': request.form.get('reddit_client_secret', ''),
+        'reddit_user_agent': request.form.get('reddit_user_agent', 'CommunityResearcher/1.0'),
+        'fb_page_id': request.form.get('fb_page_id', ''),
+        'fb_access_token': request.form.get('fb_access_token', ''),
+        'instagram_app_id': request.form.get('instagram_app_id', ''),
+        'instagram_account_id': request.form.get('instagram_account_id', ''),
+        'instagram_access_token': request.form.get('instagram_access_token', ''),
+        'imgbb_api_key': request.form.get('imgbb_api_key', ''),
+        'imagekit_public_key': request.form.get('imagekit_public_key', ''),
+        'imagekit_private_key': request.form.get('imagekit_private_key', ''),
+        'imagekit_url_endpoint': request.form.get('imagekit_url_endpoint', ''),
+        'bsky_handle': request.form.get('bsky_handle', ''),
+        'bsky_password': request.form.get('bsky_password', ''),
+        'twitter_api_key': request.form.get('twitter_api_key', ''),
+        'twitter_api_key_secret': request.form.get('twitter_api_key_secret', ''),
+        'twitter_bearer_token': request.form.get('twitter_bearer_token', ''),
+        'twitter_access_token': request.form.get('twitter_access_token', ''),
+        'twitter_access_token_secret': request.form.get('twitter_access_token_secret', ''),
+        'twitter_client_id': request.form.get('twitter_client_id', ''),
+        'twitter_client_secret': request.form.get('twitter_client_secret', '')
+    }
+    
+    # Save configuration
+    if save_config(config_data):
+        # Reload configuration
+        import importlib
+        from . import config
+        importlib.reload(config)
+        flash('Configuration saved successfully!', 'success')
+    else:
+        flash('Error saving configuration!', 'error')
+    
+    return redirect(url_for('config_page'))
 
 if __name__ == '__main__':
     app.run(debug=True)

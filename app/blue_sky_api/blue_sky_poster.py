@@ -7,15 +7,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BLUESKY_HANDLE = os.getenv("BSKY_HANDLE")  
-BLUESKY_PASSWORD = os.getenv("BSKY_PASSWORD") 
+from ..config import BSKY_HANDLE, BSKY_PASSWORD 
 
 # Configure logging for BlueskyPoster
 logger = logging.getLogger(__name__)
 
 
 class BlueskyPoster:
-    def __init__(self, handle=BLUESKY_HANDLE, password=BLUESKY_PASSWORD):
+    def __init__(self, handle=BSKY_HANDLE, password=BSKY_PASSWORD):
         self.handle = handle
         self.password = password
         self.session = None

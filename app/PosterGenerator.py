@@ -16,8 +16,8 @@ from pathlib import Path
 from google import genai
 from google.genai import types
 
-from config import APP_TEMPLATES, PLATFORM_SETTINGS
-from google_api.ads_image_generator import AdImageGenerator
+from .config import APP_TEMPLATES, PLATFORM_SETTINGS
+from .google_api.ads_image_generator import AdImageGenerator
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -81,7 +81,7 @@ class PosterGenerator:
         # )
 
         self.client = genai.Client(api_key=self.gemini_api_key)
-        self.image_ai_model = os.getenv("IMAGE_AI_MODEL")
+        self.image_ai_model = IMAGE_AI_MODEL
         self.logger = logging.getLogger(__name__)
 
     def setup_logging(self):
@@ -320,10 +320,10 @@ def main():
     """Example usage of PosterGenerator"""
 
     # You'll need to get your Gemini API key from Google AI Studio
-    GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY', 'your-api-key-here')
+    GOOGLE_API_KEY = GOOGLE_API_KEY
 
-    if GOOGLE_API_KEY == 'your-api-key-here':
-        print("Please set your GOOGLE_API_KEY environment variable")
+    if not GOOGLE_API_KEY:
+        print("Please set your GOOGLE_API_KEY in configuration")
         return
 
     # Create PosterGenerator instance

@@ -5,7 +5,7 @@ from PIL import Image
 import google.genai as genai
 from google.genai import types
 
-from config import PLATFORM_SETTINGS
+from ..config import PLATFORM_SETTINGS
 
 class AdImageGenerator:
     def __init__(self, api_key: str):

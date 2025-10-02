@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration - AdPoster</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4);
+            border-radius: 2px;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-50%) scaleX(0); }
+            50% { transform: translateX(-50%) scaleX(1); }
+            100% { transform: translateX(-50%) scaleX(0); }
+        }
+
+        .main-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .config-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .config-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .section-icon {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper .form-control {
+            padding-right: 50px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+            transition: color 0.2s ease;
+            font-size: 1rem;
+        }
+
+        .password-toggle:hover {
+            color: #495057;
+            background-color: rgba(108, 117, 125, 0.1);
+        }
+
+        .password-toggle:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.3);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+            color: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="main-title">Configuration</h1>
+            <p class="subtitle">Configure AI models and API credentials</p>
+            <div class="action-buttons">
+                <a href="/" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+
+        <div class="config-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'error' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                <!-- AI Models Section -->
+                <div class="config-section">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        AI Models
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ai_model" class="form-label">Primary AI Model</label>
+                            <select class="form-control" id="ai_model" name="ai_model">
+                                <option value="gemini-2.0-flash-lite" {{ 'selected' if config.ai_model == 'gemini-2.0-flash-lite' else '' }}>Gemini 2.0 Flash Lite</option>
+                                <option value="gemini-2.0-flash-001" {{ 'selected' if config.ai_model == 'gemini-2.0-flash-001' else '' }}>Gemini 2.0 Flash</option>
+                                <option value="gemini-2.5-flash-preview-04-17" {{ 'selected' if config.ai_model == 'gemini-2.5-flash-preview-04-17' else '' }}>Gemini 2.5 Flash Preview</option>
+                            </select>
+                            <div class="form-text">Main AI model used for content generation</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="image_ai_model" class="form-label">Image AI Model</label>
+                            <select class="form-control" id="image_ai_model" name="image_ai_model">
+                                <option value="gemini-2.0-flash" {{ 'selected' if config.image_ai_model == 'gemini-2.0-flash' else '' }}>Gemini 2.0 Flash</option>
+                                <option value="gemini-2.0-flash-lite" {{ 'selected' if config.image_ai_model == 'gemini-2.0-flash-lite' else '' }}>Gemini 2.0 Flash Lite</option>
+                            </select>
+                            <div class="form-text">AI model used for image analysis and generation</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Keys Section -->
+                <div class="config-section">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        API Keys
+                    </h2>
+
+                    <div class="form-group">
+                        <label for="google_api_key" class="form-label">Google API Key</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-control" id="google_api_key" name="google_api_key" value="{{ config.google_api_key }}">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('google_api_key')" aria-label="Show password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Required for Gemini AI models</div>
+                    </div>
+                </div>
+
+                <!-- Social Media APIs Section -->
+                <div class="config-section">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                        Social Media APIs
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fb_page_id" class="form-label">Facebook Page ID</label>
+                            <input type="text" class="form-control" id="fb_page_id" name="fb_page_id" value="{{ config.fb_page_id }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="fb_access_token" class="form-label">Facebook Access Token</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="fb_access_token" name="fb_access_token" value="{{ config.fb_access_token }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('fb_access_token')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="instagram_app_id" class="form-label">Instagram App ID</label>
+                            <input type="text" class="form-control" id="instagram_app_id" name="instagram_app_id" value="{{ config.instagram_app_id }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="instagram_account_id" class="form-label">Instagram Account ID</label>
+                            <input type="text" class="form-control" id="instagram_account_id" name="instagram_account_id" value="{{ config.instagram_account_id }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="instagram_access_token" class="form-label">Instagram Access Token</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-control" id="instagram_access_token" name="instagram_access_token" value="{{ config.instagram_access_token }}">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('instagram_access_token')" aria-label="Show password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bsky_handle" class="form-label">Bluesky Handle</label>
+                            <input type="text" class="form-control" id="bsky_handle" name="bsky_handle" value="{{ config.bsky_handle }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="bsky_password" class="form-label">Bluesky Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="bsky_password" name="bsky_password" value="{{ config.bsky_password }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('bsky_password')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="twitter_api_key" class="form-label">Twitter API Key</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="twitter_api_key" name="twitter_api_key" value="{{ config.twitter_api_key }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('twitter_api_key')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="twitter_api_key_secret" class="form-label">Twitter API Key Secret</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="twitter_api_key_secret" name="twitter_api_key_secret" value="{{ config.twitter_api_key_secret }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('twitter_api_key_secret')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="twitter_bearer_token" class="form-label">Twitter Bearer Token</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="twitter_bearer_token" name="twitter_bearer_token" value="{{ config.twitter_bearer_token }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('twitter_bearer_token')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="twitter_access_token" class="form-label">Twitter Access Token</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="twitter_access_token" name="twitter_access_token" value="{{ config.twitter_access_token }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('twitter_access_token')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="twitter_access_token_secret" class="form-label">Twitter Access Token Secret</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="twitter_access_token_secret" name="twitter_access_token_secret" value="{{ config.twitter_access_token_secret }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('twitter_access_token_secret')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="twitter_client_id" class="form-label">Twitter Client ID</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="twitter_client_id" name="twitter_client_id" value="{{ config.twitter_client_id }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('twitter_client_id')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="twitter_client_secret" class="form-label">Twitter Client Secret</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-control" id="twitter_client_secret" name="twitter_client_secret" value="{{ config.twitter_client_secret }}">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('twitter_client_secret')" aria-label="Show password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Services Section -->
+                <div class="config-section">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        Image Services
+                    </h2>
+
+                    <div class="form-group">
+                        <label for="imgbb_api_key" class="form-label">ImgBB API Key</label>
+                        <div class="password-wrapper">
+                            <input type="password" class="form-control" id="imgbb_api_key" name="imgbb_api_key" value="{{ config.imgbb_api_key }}">
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('imgbb_api_key')" aria-label="Show password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Used for image hosting</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="imagekit_public_key" class="form-label">ImageKit Public Key</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="imagekit_public_key" name="imagekit_public_key" value="{{ config.imagekit_public_key }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('imagekit_public_key')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="imagekit_private_key" class="form-label">ImageKit Private Key</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="imagekit_private_key" name="imagekit_private_key" value="{{ config.imagekit_private_key }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('imagekit_private_key')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imagekit_url_endpoint" class="form-label">ImageKit URL Endpoint</label>
+                        <input type="text" class="form-control" id="imagekit_url_endpoint" name="imagekit_url_endpoint" value="{{ config.imagekit_url_endpoint }}">
+                        <div class="form-text">ImageKit CDN endpoint URL</div>
+                    </div>
+                </div>
+
+                <!-- Reddit Section -->
+                <div class="config-section">
+                    <h2 class="section-title">
+                        <div class="section-icon">
+                            <i class="fab fa-reddit"></i>
+                        </div>
+                        Reddit API
+                    </h2>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reddit_client_id" class="form-label">Reddit Client ID</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="reddit_client_id" name="reddit_client_id" value="{{ config.reddit_client_id }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('reddit_client_id')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="reddit_client_secret" class="form-label">Reddit Client Secret</label>
+                            <div class="password-wrapper">
+                                <input type="password" class="form-control" id="reddit_client_secret" name="reddit_client_secret" value="{{ config.reddit_client_secret }}">
+                                <button type="button" class="password-toggle" onclick="togglePasswordVisibility('reddit_client_secret')" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reddit_user_agent" class="form-label">Reddit User Agent</label>
+                        <input type="text" class="form-control" id="reddit_user_agent" name="reddit_user_agent" value="{{ config.reddit_user_agent }}">
+                        <div class="form-text">User agent string for Reddit API requests</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 40px;">
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-save"></i>
+                        Save Configuration
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Password visibility toggle functionality
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const toggleBtn = input.parentElement.querySelector('.password-toggle');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                toggleBtn.setAttribute('aria-label', 'Hide password');
+            } else {
+                input.type = 'password';
+                toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                toggleBtn.setAttribute('aria-label', 'Show password');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -2,15 +2,15 @@
 import io
 import os
 
-from imagekit_api.imagekit_upload_image import ImageKitUploader
-from facebook_api.facebook_poster import FacebookPoster
-from twitter_api.twitter_poster import TwitterPoster
-from blue_sky_api.blue_sky_poster import BlueskyPoster
-from instagram_api.instagram_poster import InstagramPoster
-from PosterGenerator import AdContent, AppInfo, PosterGenerator
+from .imagekit_api.imagekit_upload_image import ImageKitUploader
+from .facebook_api.facebook_poster import FacebookPoster
+from .twitter_api.twitter_poster import TwitterPoster
+from .blue_sky_api.blue_sky_poster import BlueskyPoster
+from .instagram_api.instagram_poster import InstagramPoster
+from .PosterGenerator import AdContent, AppInfo, PosterGenerator
 from dotenv import load_dotenv
 
-from config import APP_TEMPLATES
+from .config import APP_TEMPLATES
 load_dotenv()
 
 class AdPoster:
@@ -102,9 +102,8 @@ class AdPoster:
     
     def generate_ads(self, app_info: dict, platforms: list, generate_images=True) -> dict[str, AdContent]:
         """Generate ads for specified platforms and return the data"""
-        GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY', 'your-api-key-here')
-        if GOOGLE_API_KEY == 'your-api-key-here':
-            print("Please set your GOOGLE_API_KEY environment variable")
+        if not GOOGLE_API_KEY:
+            print("Please set your GOOGLE_API_KEY in configuration")
             return {}
         
         poster_generator = PosterGenerator(GOOGLE_API_KEY)

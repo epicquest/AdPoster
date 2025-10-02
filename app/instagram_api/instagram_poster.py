@@ -5,14 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-IG_USER_ID = os.getenv('INSTAGRAM_ACCOUNT_ID')       # Instagram Business Account ID
-ACCESS_TOKEN = os.getenv('INSTAGRAM_ACCESS_TOKEN')
+from ..config import INSTAGRAM_ACCOUNT_ID, INSTAGRAM_ACCESS_TOKEN
 
 # Configure logging for InstagramPoster
 logger = logging.getLogger(__name__)
 
 class InstagramPoster:
-    def __init__(self, ig_user_id=IG_USER_ID, access_token=ACCESS_TOKEN):
+    def __init__(self, ig_user_id=INSTAGRAM_ACCOUNT_ID, access_token=INSTAGRAM_ACCESS_TOKEN):
         self.ig_user_id = ig_user_id
         self.access_token = access_token
         logger.info(f"InstagramPoster initialized with user_id: {bool(self.ig_user_id)}, access_token: {bool(self.access_token)}")
