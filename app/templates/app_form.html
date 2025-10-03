@@ -349,12 +349,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="play_store_url" class="form-label">
-                        Play Store URL <span class="required">*</span>
+                    <label for="app_url" class="form-label">
+                        App URL <span class="required">*</span>
                     </label>
-                    <input type="url" id="play_store_url" name="play_store_url" class="form-control"
-                           value="{% if app %}{{ app.play_store_url }}{% endif %}" required>
-                    <div class="help-text">Google Play Store link for the app</div>
+                    <input type="url" id="app_url" name="app_url" class="form-control"
+                           value="{% if app %}{{ app.app_url }}{% endif %}" required>
+                    <div class="help-text">App download/web link (Google Play, App Store, or website)</div>
                 </div>
 
                 <div class="form-actions">

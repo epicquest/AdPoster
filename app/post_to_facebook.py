@@ -17,7 +17,7 @@ body_text = ads_data.get("facebook", {}).get("body_text", "Check out our new ad!
 
 image_path = ads_data.get("facebook", {}).get("image_path")
 
-play_store_url = ads_data.get("facebook", {}).get("play_store_url")
+play_store_url = ads_data.get("facebook", {}).get("app_url")
 if (not image_path) or (not os.path.exists(image_path)):
     print("No valid image path found for Facebook post.")
     exit(1)

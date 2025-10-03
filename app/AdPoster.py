@@ -82,7 +82,7 @@ class AdPoster:
         for platform, ad_content in ads_data.items():
             image_path = ad_content.image_path
             body_text = ad_content.body_text
-            app_url = ad_content.play_store_url
+            app_url = ad_content.app_url
             print(f"Posting to {platform}...")
             if body_text:
                 if not image_path or not os.path.exists(image_path):

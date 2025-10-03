@@ -98,11 +98,11 @@ def home():
                             app_name = app_config['name']
                             break
                 
-                # If not found by name, try to match by play store URL
-                if not app_name and 'play_store_url' in platform_data:
-                    play_store_url = platform_data['play_store_url']
+                # If not found by name, try to match by app URL
+                if not app_name and 'app_url' in platform_data:
+                    app_url = platform_data['app_url']
                     for _, app_config in APP_TEMPLATES.items():
-                        if app_config['play_store_url'] in play_store_url or play_store_url in app_config['play_store_url']:
+                        if app_config['app_url'] in app_url or app_url in app_config['app_url']:
                             app_name = app_config['name']
                             break
                 
@@ -206,11 +206,11 @@ def view_ad(ad_file):
                     app_name = app_config['name']
                     break
         
-        # If not found by name, try to match by play store URL
-        if not app_name and 'play_store_url' in platform_data:
-            play_store_url = platform_data['play_store_url']
+        # If not found by name, try to match by app URL
+        if not app_name and 'app_url' in platform_data:
+            app_url = platform_data['app_url']
             for _, app_config in APP_TEMPLATES.items():
-                if app_config['play_store_url'] in play_store_url or play_store_url in app_config['play_store_url']:
+                if app_config['app_url'] in app_url or app_url in app_config['app_url']:
                     app_name = app_config['name']
                     break
         
@@ -381,7 +381,7 @@ def post_ad_to_platform(ad_file, platform):
         
         # Get the required data for posting
         body_text = platform_data.get('body_text', '')
-        app_url = platform_data.get('play_store_url', '')
+        app_url = platform_data.get('app_url', '')
         image_path = platform_data.get('image_path', '')
         
         # Validate required data
@@ -584,7 +584,7 @@ def add_app():
             'key_features': request.form.getlist('key_features'),
             'game_guide': request.form.get('game_guide'),
             'target_audience': request.form.get('target_audience'),
-            'play_store_url': request.form.get('play_store_url')
+            'app_url': request.form.get('app_url')
         }
         
         # Save to JSON file
@@ -611,7 +611,7 @@ def edit_app(app_key):
             'key_features': request.form.getlist('key_features'),
             'game_guide': request.form.get('game_guide'),
             'target_audience': request.form.get('target_audience'),
-            'play_store_url': request.form.get('play_store_url')
+            'app_url': request.form.get('app_url')
         }
         
         # Save to JSON file

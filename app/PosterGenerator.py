@@ -29,7 +29,7 @@ class AppInfo:
     key_features: List[str]
     game_guide: str
     target_audience: str
-    play_store_url: str
+    app_url: str
     icon_path: Optional[str] = None
     screenshots: Optional[List[str]] = None
 
@@ -38,7 +38,7 @@ class AppInfo:
 class AdContent:
     """Generated ad content structure"""
     platform: str
-    play_store_url: str
+    app_url: str
     headline: str
     body_text: str
     hashtags: List[str]
@@ -108,7 +108,7 @@ class PosterGenerator:
         Category: {app_info.category}
         Key Features: {', '.join(app_info.key_features)}
         Target Audience: {app_info.target_audience}
-        Play Store URL: {app_info.play_store_url}
+        App URL: {app_info.app_url}
 
         Platform Requirements:
         - Maximum characters: {max_chars}
@@ -150,7 +150,7 @@ class PosterGenerator:
         Category: {app_info.category}
         Key Features: {', '.join(app_info.key_features)}
         Target Audience: {app_info.target_audience}
-        Play Store URL: {app_info.play_store_url}
+        App URL: {app_info.app_url}
         Game guide: [{app_info.game_guide}]
 
         Platform Requirements:
@@ -223,7 +223,7 @@ class PosterGenerator:
                     call_to_action=content_json["call_to_action"],
                     suggested_image_description=content_json["suggested_image_description"],
                     timestamp=datetime.now().isoformat(),
-                    play_store_url=app_info.play_store_url
+                    app_url=app_info.app_url
                 )
 
                 self.logger.info(f"Successfully generated ad content for {platform}")
@@ -269,7 +269,7 @@ class PosterGenerator:
                 "suggested_image_description": ad_content.suggested_image_description,
                 "image_path": ad_content.image_path,
                 "timestamp": ad_content.timestamp,
-                "play_store_url": ad_content.play_store_url
+                "app_url": ad_content.app_url
             }
 
         with open(filepath, 'w', encoding='utf-8') as f:

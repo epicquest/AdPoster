@@ -889,17 +889,17 @@
                         </div>
                         {% endif %}
 
-                        {% if ad.get(platform, {}).get('play_store_url') %}
+                        {% if ad.get(platform, {}).get('app_url') %}
                         <div class="content-item">
                             <div class="content-label">
-                                <i class="fab fa-google-play"></i>
-                                Play Store URL
+                                <i class="fas fa-link"></i>
+                                App URL
                             </div>
                             <div class="content-value">
-                                <a href="{{ ad.get(platform, {}).get('play_store_url', '') }}" 
+                                <a href="{{ ad.get(platform, {}).get('app_url', '') }}" 
                                    target="_blank" 
                                    style="color: #667eea; text-decoration: none; font-weight: 500;">
-                                    {{ ad.get(platform, {}).get('play_store_url', '') }}
+                                    {{ ad.get(platform, {}).get('app_url', '') }}
                                 </a>
                             </div>
                         </div>

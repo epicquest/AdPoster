@@ -12,7 +12,7 @@ with open(ads_json_path, "r") as f:
 
 body_text = ads_data.get("twitter", {}).get("body_text")
 image_path = ads_data.get("twitter", {}).get("image_path")
-play_store_url = ads_data.get("twitter", {}).get("play_store_url")
+play_store_url = ads_data.get("twitter", {}).get("app_url")
 # if (not image_path) or (not os.path.exists(image_path)):
 #     print("No valid image path found for Twitter/X post.")
 #     exit(1)
