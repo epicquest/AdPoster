@@ -115,11 +115,75 @@ def save_config(config_data):
 APP_TEMPLATES = {}
 
 input_dir = os.path.join(os.path.dirname(__file__), '..', 'input')
-for filename in os.listdir(input_dir):
-    if filename.endswith('.json'):
-        key = filename[:-5]  # remove .json
-        with open(os.path.join(input_dir, filename), 'r') as f:
-            APP_TEMPLATES[key] = json.load(f)
+
+def load_app_templates():
+    """Load app templates from input directory with error handling."""
+    templates = {}
+    
+    # Create input directory if it doesn't exist
+    if not os.path.exists(input_dir):
+        try:
+            os.makedirs(input_dir)
+            print(f"Created input directory: {input_dir}")
+        except OSError as e:
+            print(f"Warning: Could not create input directory {input_dir}: {e}")
+            return templates
+    
+    # Load templates from JSON files
+    try:
+        if not os.path.isdir(input_dir):
+            print(f"Warning: Input path {input_dir} is not a directory")
+            return templates
+            
+        files = os.listdir(input_dir)
+        json_files = [f for f in files if f.endswith('.json')]
+        
+        if not json_files:
+            print(f"Warning: No JSON files found in {input_dir}")
+            # Create a sample app template to get users started
+            sample_app = {
+                "name": "Sample App",
+                "description": "A sample Android app for demonstration purposes. Replace this with your actual app details.",
+                "category": "Tools",
+                "key_features": [
+                    "Easy to use interface",
+                    "Fast and reliable",
+                    "Regular updates"
+                ],
+                "game_guide": "This is a sample app. Please edit this template with your actual app information through the web interface.",
+                "target_audience": "General users looking for useful tools",
+                "app_url": "https://play.google.com/store/apps/details?id=com.example.sampleapp"
+            }
+            
+            try:
+                sample_file = os.path.join(input_dir, 'sample_app.json')
+                with open(sample_file, 'w') as f:
+                    json.dump(sample_app, f, indent=4)
+                templates['sample_app'] = sample_app
+                print(f"Created sample app template: {sample_file}")
+            except IOError as e:
+                print(f"Warning: Could not create sample app template: {e}")
+            
+            return templates
+            
+        for filename in json_files:
+            try:
+                key = filename[:-5]  # remove .json
+                file_path = os.path.join(input_dir, filename)
+                with open(file_path, 'r') as f:
+                    templates[key] = json.load(f)
+                print(f"Loaded app template: {key}")
+            except (json.JSONDecodeError, IOError) as e:
+                print(f"Warning: Could not load {filename}: {e}")
+                continue
+                
+    except OSError as e:
+        print(f"Warning: Could not access input directory {input_dir}: {e}")
+    
+    return templates
+
+# Load app templates at startup
+APP_TEMPLATES = load_app_templates()
 PLATFORM_SETTINGS = {
     "facebook": {
         "max_chars": 2200,

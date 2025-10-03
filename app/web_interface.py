@@ -17,6 +17,14 @@ logging.basicConfig(level=logging.DEBUG)
 # Path to the output directory where ads are stored
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), '../output')
 
+# Ensure output directory exists
+if not os.path.exists(OUTPUT_DIR):
+    try:
+        os.makedirs(OUTPUT_DIR)
+        logging.info(f"Created output directory: {OUTPUT_DIR}")
+    except OSError as e:
+        logging.error(f"Could not create output directory {OUTPUT_DIR}: {e}")
+
 def get_images_for_ad(ad_file):
     """Retrieve image files associated with a specific ad by reading the JSON file."""
     ad_path = os.path.join(OUTPUT_DIR, ad_file)
@@ -178,7 +186,17 @@ def home():
                 "posting_status": "Error"
             })
     
-    return render_template('home.html', ads=ads, total_campaigns=len(ads), platform_settings=PLATFORM_SETTINGS, app_templates=APP_TEMPLATES)
+    # Check if user needs guidance
+    needs_setup = not APP_TEMPLATES or len(APP_TEMPLATES) == 0
+    has_sample_only = len(APP_TEMPLATES) == 1 and 'sample_app' in APP_TEMPLATES
+    
+    return render_template('home.html', 
+                         ads=ads, 
+                         total_campaigns=len(ads), 
+                         platform_settings=PLATFORM_SETTINGS, 
+                         app_templates=APP_TEMPLATES,
+                         needs_setup=needs_setup,
+                         has_sample_only=has_sample_only)
 
 @app.route('/ad/<ad_file>')
 def view_ad(ad_file):
@@ -255,6 +273,12 @@ def generate_ad_page():
     """Display the ad generation page."""
     app_templates = APP_TEMPLATES
     platform_settings = PLATFORM_SETTINGS
+    
+    # Check if we have any app templates
+    if not app_templates:
+        flash('No app templates found. Please add at least one app before generating ads.', 'warning')
+        return redirect(url_for('list_apps'))
+    
     return render_template('generate.html', 
                          app_templates=app_templates, 
                          platform_settings=platform_settings)
@@ -285,11 +309,18 @@ def generate_ad():
                 "message": "Please select at least one platform"
             })
         
+        # Check if we have any app templates
+        if not APP_TEMPLATES:
+            return jsonify({
+                "status": "error",
+                "message": "No app templates available. Please add at least one app first."
+            })
+        
         # Find the app template
         if selected_app_key not in APP_TEMPLATES:
             return jsonify({
                 "status": "error", 
-                "message": f"App template not found for key: {selected_app_key}"
+                "message": f"App template not found for key: {selected_app_key}. Available apps: {list(APP_TEMPLATES.keys())}"
             })
         
         app_template = APP_TEMPLATES[selected_app_key].copy()
