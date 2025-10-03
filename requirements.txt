@@ -13,24 +13,24 @@ Pillow>=9.0.0
 
 # HTTP and API
 requests>=2.28.0
-requests-oauthlib
+requests-oauthlib>=1.3.1
 
 # Environment and Configuration
 # python-dotenv>=0.19.0  # Removed - using config.json as single source of truth
 
 # AI and ML
-google-generativeai
-langchain
-langchain_google_genai
+google-generativeai>=0.3.0
+langchain>=0.1.0
+langchain-google-genai>=1.0.0
 
 # Social Media APIs
-tweepy
-atproto
-imagekitio-python
+tweepy>=4.14.0
+atproto>=0.0.33
+imagekitio>=3.0.0
 
 # Reddit API
-praw
+praw>=7.6.0
 
 # Utilities
-grapheme
+grapheme>=0.6.0
 MarkupSafe==3.0.2
