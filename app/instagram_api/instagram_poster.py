@@ -1,9 +1,6 @@
 import requests
 import os
 import logging
-from dotenv import load_dotenv
-
-load_dotenv()
 
 from ..config import INSTAGRAM_ACCOUNT_ID, INSTAGRAM_ACCESS_TOKEN
 

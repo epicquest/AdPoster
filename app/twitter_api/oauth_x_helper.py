@@ -2,17 +2,15 @@ import os
 import base64
 import hashlib
 import secrets
-from dotenv import load_dotenv
 import requests
 from urllib.parse import urlencode
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-load_dotenv()
+from ..config import TWITTER_CLIENT_ID, TWITTER_CLIENT_SECRET
 
-
-# Load from environment or hardcode for testing
-CLIENT_ID = os.getenv("TWITTER_CLIENT_ID")
-CLIENT_SECRET = os.getenv("TWITTER_CLIENT_SECRET")  # only needed if you use client_secret_post
+# Load from config
+CLIENT_ID = TWITTER_CLIENT_ID
+CLIENT_SECRET = TWITTER_CLIENT_SECRET  # only needed if you use client_secret_post
 REDIRECT_URI = "http://127.0.0.1:8000/callback"
 SCOPES = "tweet.read tweet.write users.read offline.access"
 

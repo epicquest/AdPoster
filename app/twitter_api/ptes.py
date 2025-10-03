@@ -1,16 +1,9 @@
 import os
 import tweepy
-from dotenv import load_dotenv
 from typing import Optional
 import datetime
 
-load_dotenv()
-
-# Your environment variables should remain the same
-TWITTER_ACCESS_TOKEN = os.getenv("TWITTER_ACCESS_TOKEN")
-TWITTER_ACCESS_TOKEN_SECRET = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
-TWITTER_API_KEY = os.getenv("TWITTER_API_KEY")
-TWITTER_API_KEY_SECRET = os.getenv("TWITTER_API_KEY_SECRET")
+from ..config import TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET, TWITTER_API_KEY, TWITTER_API_KEY_SECRET
 
 class TwitterPoster:
     def __init__(self,

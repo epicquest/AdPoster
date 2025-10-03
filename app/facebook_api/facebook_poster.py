@@ -1,9 +1,6 @@
 import requests
-from dotenv import load_dotenv
 import os
 import logging
-
-load_dotenv()
 
 from ..config import FB_PAGE_ID, FB_ACCESS_TOKEN
 

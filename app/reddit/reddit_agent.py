@@ -13,6 +13,8 @@ from langchain.prompts import PromptTemplate
 from langchain.tools.base import BaseTool
 from pydantic import BaseModel, Field
 
+from ..config import REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USER_AGENT, GOOGLE_API_KEY
+
 class RedditSearchInput(BaseModel):
     """Input for the Reddit community searcher tool."""
     keywords: List[str] = Field(..., description="A list of keywords to search for.")
@@ -29,9 +31,9 @@ class RedditCommunityTool(BaseTool):
         super().__init__(**data)
         try:
             self.reddit = praw.Reddit(
-                client_id=os.getenv("REDDIT_CLIENT_ID"),
-                client_secret=os.getenv("REDDIT_CLIENT_SECRET"),
-                user_agent=os.getenv("REDDIT_USER_AGENT", "CommunityResearcher/1.0")
+                client_id=REDDIT_CLIENT_ID,
+                client_secret=REDDIT_CLIENT_SECRET,
+                user_agent=REDDIT_USER_AGENT or "CommunityResearcher/1.0"
             )
         except Exception as e:
             print(f"Warning: Could not initialize Reddit client: {e}")
@@ -435,21 +437,23 @@ def main():
     # You'll need to set these:
     # REDDIT_CLIENT_ID, REDDIT_CLIENT_SECRET, REDDIT_USER_AGENT, GOOGLE_API_KEY
 
-    # Check if required environment variables are set
-    required_env_vars = ["REDDIT_CLIENT_ID", "REDDIT_CLIENT_SECRET", "GOOGLE_API_KEY"]
-    missing_vars = [var for var in required_env_vars if not os.getenv(var)]
+    # Check if required configuration variables are set
+    missing_vars = []
+    if not REDDIT_CLIENT_ID:
+        missing_vars.append("REDDIT_CLIENT_ID")
+    if not REDDIT_CLIENT_SECRET:
+        missing_vars.append("REDDIT_CLIENT_SECRET")
+    if not GOOGLE_API_KEY:
+        missing_vars.append("GOOGLE_API_KEY")
 
     if missing_vars:
-        print(f"Missing required environment variables: {', '.join(missing_vars)}")
-        print("\nPlease set these environment variables:")
-        print("export REDDIT_CLIENT_ID='your_client_id'")
-        print("export REDDIT_CLIENT_SECRET='your_client_secret'")
-        print("export REDDIT_USER_AGENT='YourApp/1.0'")
-        print("export GOOGLE_API_KEY='your_google_api_key'")
+        print(f"Missing required configuration variables: {', '.join(missing_vars)}")
+        print("\nPlease set these in your configuration/config.json file:")
+        print("reddit_client_id, reddit_client_secret, google_api_key")
         return
 
     # Initialize agent
-    agent = RedditCommunityAgent(google_api_key=os.getenv("GOOGLE_API_KEY"))
+    agent = RedditCommunityAgent(google_api_key=GOOGLE_API_KEY)
 
     # Example app description
     # app_description = """

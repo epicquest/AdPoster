@@ -1,10 +1,7 @@
 import os
 import requests
-from dotenv import load_dotenv
 
-load_dotenv()
-
-IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
+from ..config import IMGBB_API_KEY
 
 def upload_to_imgbb(image_path) -> str:
     with open(image_path, "rb") as file:

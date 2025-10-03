@@ -1,10 +1,7 @@
 import os
 import tweepy
 import logging
-from dotenv import load_dotenv
 from typing import Optional
-
-load_dotenv()
 
 from ..config import TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET, TWITTER_API_KEY, TWITTER_API_KEY_SECRET
 

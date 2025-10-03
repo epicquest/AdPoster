@@ -1,11 +1,6 @@
 import os
-from dotenv import load_dotenv
 from imagekitio.client import ImageKit
 from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
-
-
-
-load_dotenv()
 
 from ..config import IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, IMAGEKIT_URL_ENDPOINT
  

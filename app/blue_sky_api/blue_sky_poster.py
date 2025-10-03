@@ -3,9 +3,6 @@ import requests
 import datetime
 import os
 import logging
-from dotenv import load_dotenv
-
-load_dotenv()
 
 from ..config import BSKY_HANDLE, BSKY_PASSWORD 
 
