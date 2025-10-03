@@ -168,9 +168,16 @@
             accent-color: #667eea;
         }
 
-        .platform-checkbox.checked {
-            border-color: #667eea;
-            background: #f8f9ff;
+        .platform-checkbox.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #f5f5f5;
+            border-color: #ccc;
+        }
+
+        .platform-checkbox.disabled:hover {
+            border-color: #ccc;
+            background: #f5f5f5;
         }
 
         .platform-name {
@@ -366,10 +373,10 @@
                     </h3>
                     <div class="platform-grid">
                         {% for platform_key, platform_data in platform_settings.items() %}
-                        <label class="platform-checkbox" for="platform_{{ platform_key }}">
-                            <input type="checkbox" id="platform_{{ platform_key }}" name="platforms" value="{{ platform_key }}">
+                        <label class="platform-checkbox{% if platform_data.get('disabled', False) %} disabled{% endif %}" for="platform_{{ platform_key }}">
+                            <input type="checkbox" id="platform_{{ platform_key }}" name="platforms" value="{{ platform_key }}"{% if platform_data.get('disabled', False) %} disabled{% endif %}>
                             <div>
-                                <div class="platform-name">{{ platform_key.title() }}</div>
+                                <div class="platform-name">{{ platform_key.title() }}{% if platform_data.get('disabled', False) %} (WIP){% endif %}</div>
                                 <div class="platform-info">{{ platform_data.max_chars }} chars max</div>
                             </div>
                         </label>

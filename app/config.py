@@ -161,6 +161,7 @@ PLATFORM_SETTINGS = {
         ]
     },
     "linkedin": {
+        "disabled": True,
         "max_chars": 3000,
         "hashtag_limit": 20,
         "optimal_image_size": (1200, 627),
@@ -174,6 +175,7 @@ PLATFORM_SETTINGS = {
         ]
     },
     "tiktok": {
+        "disabled": True,
         "max_chars": 2200,
         "hashtag_limit": 20,
         "optimal_image_size": (1080, 1920),

@@ -269,6 +269,9 @@ def generate_ad():
         generate_images = request.form.get('generate_images') == 'on'
         custom_feature = request.form.get('custom_feature', '').strip()
         
+        # Filter out disabled platforms
+        selected_platforms = [p for p in selected_platforms if not PLATFORM_SETTINGS.get(p, {}).get('disabled', False)]
+        
         # Validate input
         if not selected_app_key:
             return jsonify({
