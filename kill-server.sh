@@ -3,20 +3,32 @@
 # AdPoster Server Kill Script
 # This script stops the running Flask development server
 
-# Find all server processes
-SERVER_PIDS=$(ps aux | grep "web_interface.py" | grep -v grep | awk '{print $2}')
+# Find all server processes with multiple patterns
+SERVER_PIDS=$(ps aux | grep -E "(web_interface|app\.web_interface|python.*web_interface)" | grep -v grep | awk '{print $2}')
 
-if [ -z "$SERVER_PIDS" ]; then
+# Also check for processes using port 5000
+PORT_PIDS=$(lsof -ti :5000 2>/dev/null || true)
+
+# Combine all PIDs
+ALL_PIDS="$SERVER_PIDS $PORT_PIDS"
+ALL_PIDS=$(echo $ALL_PIDS | tr ' ' '\n' | sort -u | tr '\n' ' ')
+
+if [ -z "$ALL_PIDS" ] || [ "$ALL_PIDS" = " " ]; then
     echo "No AdPoster server process found running."
+    echo "Checking for any process on port 5000..."
+    lsof -i :5000 2>/dev/null || echo "Port 5000 is free."
     exit 0
 fi
 
-echo "Found AdPoster server process(es): $SERVER_PIDS"
+echo "Found AdPoster server process(es): $ALL_PIDS"
 echo "Stopping server(s)..."
 
 # Kill all processes gracefully first
-for PID in $SERVER_PIDS; do
-    kill $PID 2>/dev/null
+for PID in $ALL_PIDS; do
+    if [ -n "$PID" ] && [ "$PID" != " " ]; then
+        echo "Killing PID: $PID"
+        kill $PID 2>/dev/null
+    fi
 done
 
 # Wait a moment for graceful shutdown
@@ -24,8 +36,8 @@ sleep 2
 
 # Check if any are still running and force kill if needed
 REMAINING_PIDS=""
-for PID in $SERVER_PIDS; do
-    if ps -p $PID > /dev/null 2>&1; then
+for PID in $ALL_PIDS; do
+    if [ -n "$PID" ] && [ "$PID" != " " ] && ps -p $PID > /dev/null 2>&1; then
         REMAINING_PIDS="$REMAINING_PIDS $PID"
     fi
 done
@@ -40,8 +52,8 @@ fi
 
 # Final check
 ALL_KILLED=true
-for PID in $SERVER_PIDS; do
-    if ps -p $PID > /dev/null 2>&1; then
+for PID in $ALL_PIDS; do
+    if [ -n "$PID" ] && [ "$PID" != " " ] && ps -p $PID > /dev/null 2>&1; then
         ALL_KILLED=false
         break
     fi
