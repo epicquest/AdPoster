@@ -645,6 +645,34 @@ def delete_app(app_key):
     
     return redirect(url_for('list_apps'))
 
+@app.route('/campaign/<campaign_file>/delete', methods=['POST'])
+def delete_campaign(campaign_file):
+    """Delete a campaign and its associated images."""
+    # Validate filename to prevent directory traversal
+    if not campaign_file.endswith('.json') or '..' in campaign_file:
+        return "Invalid campaign file", 400
+    
+    # Delete the JSON file
+    json_path = os.path.join(OUTPUT_DIR, campaign_file)
+    if os.path.exists(json_path):
+        os.remove(json_path)
+        logging.info(f"Deleted campaign file: {campaign_file}")
+    
+    # Delete associated images
+    base_name = campaign_file.replace('.json', '')
+    image_extensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp']
+    
+    for ext in image_extensions:
+        # Delete platform-specific images
+        for platform in PLATFORM_SETTINGS.keys():
+            image_file = f"{base_name}_{platform}{ext}"
+            image_path = os.path.join(OUTPUT_DIR, image_file)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+                logging.info(f"Deleted image: {image_file}")
+    
+    return redirect(url_for('home'))
+
 @app.route('/config')
 def config_page():
     """Configuration page"""
