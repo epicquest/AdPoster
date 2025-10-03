@@ -16,10 +16,8 @@ from pathlib import Path
 from google import genai
 from google.genai import types
 
-from .config import APP_TEMPLATES, PLATFORM_SETTINGS
+from .config import APP_TEMPLATES, PLATFORM_SETTINGS, IMAGE_AI_MODEL
 from .google_api.ads_image_generator import AdImageGenerator
-from dotenv import load_dotenv
-load_dotenv()
 
 
 @dataclass

@@ -5,10 +5,6 @@ Copy this to config.py and fill in your actual values
 
 import os
 import json
-from dotenv import load_dotenv
-
-# Load environment variables from .env file (fallback)
-load_dotenv()
 
 # Load configuration from JSON file
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), '..', 'configuration', 'config.json')
@@ -41,34 +37,34 @@ def load_config():
             print(f"Warning: Could not load config from {CONFIG_FILE}: {e}")
             config = {}
 
-    # Fallback to environment variables if not in config
-    config.setdefault('ai_model', os.getenv('AI_MODEL_LITE', 'gemini-2.0-flash-lite'))
-    config.setdefault('ai_model_lite', os.getenv('AI_MODEL_LITE', 'gemini-2.0-flash-lite'))
-    config.setdefault('ai_model_full', os.getenv('AI_MODEL', 'gemini-2.0-flash-001'))
-    config.setdefault('ai_model2', os.getenv('AI_MODEL2', 'gemini-2.5-flash-preview-04-17'))
-    config.setdefault('google_api_key', os.getenv('GOOGLE_API_KEY', ''))
-    config.setdefault('image_ai_model', os.getenv('IMAGE_AI_MODEL', 'gemini-2.0-flash'))
-    config.setdefault('reddit_client_id', os.getenv('REDDIT_CLIENT_ID', ''))
-    config.setdefault('reddit_client_secret', os.getenv('REDDIT_CLIENT_SECRET', ''))
-    config.setdefault('reddit_user_agent', os.getenv('REDDIT_USER_AGENT', 'CommunityResearcher/1.0'))
-    config.setdefault('fb_page_id', os.getenv('FB_PAGE_ID', ''))
-    config.setdefault('fb_access_token', os.getenv('FB_ACCESS_TOKEN', ''))
-    config.setdefault('instagram_app_id', os.getenv('INSTAGRAM_APP_ID', ''))
-    config.setdefault('instagram_account_id', os.getenv('INSTAGRAM_ACCOUNT_ID', ''))
-    config.setdefault('instagram_access_token', os.getenv('INSTAGRAM_ACCESS_TOKEN', ''))
-    config.setdefault('imgbb_api_key', os.getenv('IMGBB_API_KEY', ''))
-    config.setdefault('imagekit_public_key', os.getenv('IMAGEKIT_PUBLIC_KEY', ''))
-    config.setdefault('imagekit_private_key', os.getenv('IMAGEKIT_PRIVATE_KEY', ''))
-    config.setdefault('imagekit_url_endpoint', os.getenv('IMAGEKIT_URL_ENDPOINT', ''))
-    config.setdefault('bsky_handle', os.getenv('BSKY_HANDLE', ''))
-    config.setdefault('bsky_password', os.getenv('BSKY_PASSWORD', ''))
-    config.setdefault('twitter_api_key', os.getenv('TWITTER_API_KEY', ''))
-    config.setdefault('twitter_api_key_secret', os.getenv('TWITTER_API_KEY_SECRET', ''))
-    config.setdefault('twitter_bearer_token', os.getenv('TWITTER_BEARER_TOKEN', ''))
-    config.setdefault('twitter_access_token', os.getenv('TWITTER_ACCESS_TOKEN', ''))
-    config.setdefault('twitter_access_token_secret', os.getenv('TWITTER_ACCESS_TOKEN_SECRET', ''))
-    config.setdefault('twitter_client_id', os.getenv('TWITTER_CLIENT_ID', ''))
-    config.setdefault('twitter_client_secret', os.getenv('TWITTER_CLIENT_SECRET', ''))
+    # Set default values if not in config (no environment variable fallbacks)
+    config.setdefault('ai_model', 'gemini-2.0-flash-lite')
+    config.setdefault('ai_model_lite', 'gemini-2.0-flash-lite')
+    config.setdefault('ai_model_full', 'gemini-2.0-flash-001')
+    config.setdefault('ai_model2', 'gemini-2.5-flash-preview-04-17')
+    config.setdefault('google_api_key', '')
+    config.setdefault('image_ai_model', 'gemini-2.0-flash')
+    config.setdefault('reddit_client_id', '')
+    config.setdefault('reddit_client_secret', '')
+    config.setdefault('reddit_user_agent', 'CommunityResearcher/1.0')
+    config.setdefault('fb_page_id', '')
+    config.setdefault('fb_access_token', '')
+    config.setdefault('instagram_app_id', '')
+    config.setdefault('instagram_account_id', '')
+    config.setdefault('instagram_access_token', '')
+    config.setdefault('imgbb_api_key', '')
+    config.setdefault('imagekit_public_key', '')
+    config.setdefault('imagekit_private_key', '')
+    config.setdefault('imagekit_url_endpoint', '')
+    config.setdefault('bsky_handle', '')
+    config.setdefault('bsky_password', '')
+    config.setdefault('twitter_api_key', '')
+    config.setdefault('twitter_api_key_secret', '')
+    config.setdefault('twitter_bearer_token', '')
+    config.setdefault('twitter_access_token', '')
+    config.setdefault('twitter_access_token_secret', '')
+    config.setdefault('twitter_client_id', '')
+    config.setdefault('twitter_client_secret', '')
 
     return config
 

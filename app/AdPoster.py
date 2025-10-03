@@ -8,10 +8,8 @@ from .twitter_api.twitter_poster import TwitterPoster
 from .blue_sky_api.blue_sky_poster import BlueskyPoster
 from .instagram_api.instagram_poster import InstagramPoster
 from .PosterGenerator import AdContent, AppInfo, PosterGenerator
-from dotenv import load_dotenv
 
-from .config import APP_TEMPLATES
-load_dotenv()
+from .config import APP_TEMPLATES, GOOGLE_API_KEY, IMAGE_AI_MODEL
 
 class AdPoster:
     """Main AdPoster class for generating social media ads"""
