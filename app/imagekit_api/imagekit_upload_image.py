@@ -1,16 +1,15 @@
-import os
 from imagekitio.client import ImageKit
 from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
 
-from ..config import IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, IMAGEKIT_URL_ENDPOINT
- 
+from ..config import IMAGEKIT_PRIVATE_KEY, IMAGEKIT_PUBLIC_KEY, IMAGEKIT_URL_ENDPOINT
+
 
 class ImageKitUploader:
     def __init__(self):
         self.imagekit = ImageKit(
             private_key=IMAGEKIT_PRIVATE_KEY,
             public_key=IMAGEKIT_PUBLIC_KEY,
-            url_endpoint=IMAGEKIT_URL_ENDPOINT
+            url_endpoint=IMAGEKIT_URL_ENDPOINT,
         )
 
     def upload_image(self, file_path, file_name, tags=None):
@@ -18,9 +17,7 @@ class ImageKitUploader:
             with open(file_path, "rb") as file_to_upload:
                 options = UploadFileRequestOptions(tags=tags or [])
                 upload = self.imagekit.upload_file(
-                    file=file_to_upload,
-                    file_name=file_name,
-                    options=options
+                    file=file_to_upload, file_name=file_name, options=options
                 )
             if upload.response_metadata.http_status_code == 200:
                 return upload.url
@@ -31,6 +28,6 @@ class ImageKitUploader:
         except FileNotFoundError:
             print(f"Error: The file '{file_path}' was not found.")
             return None
-        except Exception as e:
+        except (IOError, OSError, ValueError, ConnectionError, TimeoutError) as e:
             print(f"An unexpected error occurred: {e}")
             return None

@@ -1,10 +1,11 @@
-import os
 import base64
 import hashlib
+import os
 import secrets
-import requests
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlencode
-from http.server import HTTPServer, BaseHTTPRequestHandler
+
+import requests
 
 from ..config import TWITTER_CLIENT_ID, TWITTER_CLIENT_SECRET
 
@@ -16,23 +17,28 @@ SCOPES = "tweet.read tweet.write users.read offline.access"
 
 # Step 1: Generate code verifier + challenge
 code_verifier = secrets.token_urlsafe(100)[:128]
-code_challenge = base64.urlsafe_b64encode(
-    hashlib.sha256(code_verifier.encode()).digest()
-).rstrip(b"=").decode("utf-8")
+code_challenge = (
+    base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
+    .rstrip(b"=")
+    .decode("utf-8")
+)
 
 # Step 2: Build authorization URL
-auth_url = "https://twitter.com/i/oauth2/authorize?" + urlencode({
-    "response_type": "code",
-    "client_id": CLIENT_ID,
-    "redirect_uri": REDIRECT_URI,
-    "scope": SCOPES,
-    "state": "random_state_123",
-    "code_challenge": code_challenge,
-    "code_challenge_method": "S256"
-})
+auth_url = "https://twitter.com/i/oauth2/authorize?" + urlencode(
+    {
+        "response_type": "code",
+        "client_id": CLIENT_ID,
+        "redirect_uri": REDIRECT_URI,
+        "scope": SCOPES,
+        "state": "random_state_123",
+        "code_challenge": code_challenge,
+        "code_challenge_method": "S256",
+    }
+)
 
 print("👉 Open this URL in your browser and log in:\n")
 print(auth_url, "\n")
+
 
 # Step 3: Simple web server to catch callback
 class Handler(BaseHTTPRequestHandler):
@@ -54,7 +60,7 @@ class Handler(BaseHTTPRequestHandler):
                 "code": auth_code,
                 "redirect_uri": REDIRECT_URI,
                 "code_verifier": code_verifier,
-                "client_secret": CLIENT_SECRET, 
+                "client_secret": CLIENT_SECRET,
             }
 
             response = requests.post(token_url, data=data)
@@ -66,6 +72,7 @@ class Handler(BaseHTTPRequestHandler):
                 f.write(response.text)
 
             os._exit(0)
+
 
 httpd = HTTPServer(("127.0.0.1", 8000), Handler)
 httpd.serve_forever()

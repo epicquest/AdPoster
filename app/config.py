@@ -3,12 +3,17 @@ Configuration file for AdPoster
 Copy this to config.py and fill in your actual values
 """
 
-import os
 import json
+import os
 
 # Load configuration from JSON file
-CONFIG_FILE = os.path.join(os.path.dirname(__file__), '..', 'configuration', 'config.json')
-DEFAULT_CONFIG_FILE = os.path.join(os.path.dirname(__file__), '..', 'configuration', 'default_config.json')
+CONFIG_FILE = os.path.join(
+    os.path.dirname(__file__), "..", "configuration", "config.json"
+)
+DEFAULT_CONFIG_FILE = os.path.join(
+    os.path.dirname(__file__), "..", "configuration", "default_config.json"
+)
+
 
 def load_config():
     """Load configuration from JSON file, with fallback to environment variables"""
@@ -18,84 +23,83 @@ def load_config():
     if not os.path.exists(CONFIG_FILE):
         if os.path.exists(DEFAULT_CONFIG_FILE):
             try:
-                with open(DEFAULT_CONFIG_FILE, 'r') as f:
+                with open(DEFAULT_CONFIG_FILE, "r", encoding="utf-8") as f:
                     default_config = json.load(f)
-                with open(CONFIG_FILE, 'w') as f:
+                with open(CONFIG_FILE, "w", encoding="utf-8") as f:
                     json.dump(default_config, f, indent=4)
                 print(f"Created {CONFIG_FILE} from {DEFAULT_CONFIG_FILE}")
             except (json.JSONDecodeError, IOError) as e:
-                print(f"Warning: Could not create config from {DEFAULT_CONFIG_FILE}: {e}")
+                print(
+                    f"Warning: Could not create config from {DEFAULT_CONFIG_FILE}: {e}"
+                )
         else:
             print(f"Warning: Neither {CONFIG_FILE} nor {DEFAULT_CONFIG_FILE} found")
 
     # Try to load from JSON file
     if os.path.exists(CONFIG_FILE):
         try:
-            with open(CONFIG_FILE, 'r') as f:
+            with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 config = json.load(f)
         except (json.JSONDecodeError, IOError) as e:
             print(f"Warning: Could not load config from {CONFIG_FILE}: {e}")
             config = {}
 
     # Set default values if not in config (no environment variable fallbacks)
-    config.setdefault('ai_model', 'gemini-2.0-flash-lite')
-    config.setdefault('ai_model_lite', 'gemini-2.0-flash-lite')
-    config.setdefault('ai_model_full', 'gemini-2.0-flash-001')
-    config.setdefault('ai_model2', 'gemini-2.5-flash-preview-04-17')
-    config.setdefault('google_api_key', '')
-    config.setdefault('image_ai_model', 'gemini-2.0-flash')
-    config.setdefault('reddit_client_id', '')
-    config.setdefault('reddit_client_secret', '')
-    config.setdefault('reddit_user_agent', 'CommunityResearcher/1.0')
-    config.setdefault('fb_page_id', '')
-    config.setdefault('fb_access_token', '')
-    config.setdefault('instagram_app_id', '')
-    config.setdefault('instagram_account_id', '')
-    config.setdefault('instagram_access_token', '')
-    config.setdefault('imgbb_api_key', '')
-    config.setdefault('imagekit_public_key', '')
-    config.setdefault('imagekit_private_key', '')
-    config.setdefault('imagekit_url_endpoint', '')
-    config.setdefault('bsky_handle', '')
-    config.setdefault('bsky_password', '')
-    config.setdefault('twitter_api_key', '')
-    config.setdefault('twitter_api_key_secret', '')
-    config.setdefault('twitter_bearer_token', '')
-    config.setdefault('twitter_access_token', '')
-    config.setdefault('twitter_access_token_secret', '')
-    config.setdefault('twitter_client_id', '')
-    config.setdefault('twitter_client_secret', '')
+    config.setdefault("ai_model", "gemini-2.0-flash-lite")
+    config.setdefault("ai_model_lite", "gemini-2.0-flash-lite")
+    config.setdefault("ai_model_full", "gemini-2.0-flash-001")
+    config.setdefault("ai_model2", "gemini-2.5-flash-preview-04-17")
+    config.setdefault("google_api_key", "")
+    config.setdefault("image_ai_model", "gemini-2.0-flash")
+    config.setdefault("fb_page_id", "")
+    config.setdefault("fb_access_token", "")
+    config.setdefault("instagram_app_id", "")
+    config.setdefault("instagram_account_id", "")
+    config.setdefault("instagram_access_token", "")
+    config.setdefault("imgbb_api_key", "")
+    config.setdefault("imagekit_public_key", "")
+    config.setdefault("imagekit_private_key", "")
+    config.setdefault("imagekit_url_endpoint", "")
+    config.setdefault("bsky_handle", "")
+    config.setdefault("bsky_password", "")
+    config.setdefault("twitter_api_key", "")
+    config.setdefault("twitter_api_key_secret", "")
+    config.setdefault("twitter_bearer_token", "")
+    config.setdefault("twitter_access_token", "")
+    config.setdefault("twitter_access_token_secret", "")
+    config.setdefault("twitter_client_id", "")
+    config.setdefault("twitter_client_secret", "")
 
     return config
+
 
 # Load configuration
 CONFIG = load_config()
 
 # Extract individual config values for backward compatibility
-AI_MODEL_LITE = CONFIG['ai_model_lite']
-AI_MODEL = CONFIG['ai_model_full']
-AI_MODEL2 = CONFIG['ai_model2']
-GOOGLE_API_KEY = CONFIG['google_api_key']
-IMAGE_AI_MODEL = CONFIG['image_ai_model']
-REDDIT_CLIENT_ID = CONFIG['reddit_client_id']
-REDDIT_CLIENT_SECRET = CONFIG['reddit_client_secret']
-REDDIT_USER_AGENT = CONFIG['reddit_user_agent']
-FB_PAGE_ID = CONFIG['fb_page_id']
-FB_ACCESS_TOKEN = CONFIG['fb_access_token']
-INSTAGRAM_APP_ID = CONFIG['instagram_app_id']
-INSTAGRAM_ACCOUNT_ID = CONFIG['instagram_account_id']
-INSTAGRAM_ACCESS_TOKEN = CONFIG['instagram_access_token']
-IMGBB_API_KEY = CONFIG['imgbb_api_key']
-IMAGEKIT_PUBLIC_KEY = CONFIG['imagekit_public_key']
-IMAGEKIT_PRIVATE_KEY = CONFIG['imagekit_private_key']
-IMAGEKIT_URL_ENDPOINT = CONFIG['imagekit_url_endpoint']
-BSKY_HANDLE = CONFIG['bsky_handle']
-BSKY_PASSWORD = CONFIG['bsky_password']
-TWITTER_API_KEY = CONFIG['twitter_api_key']
-TWITTER_API_KEY_SECRET = CONFIG['twitter_api_key_secret']
-TWITTER_BEARER_TOKEN = CONFIG['twitter_bearer_token']
-TWITTER_ACCESS_TOKEN = CONFIG['twitter_access_token']
-TWITTER_ACCESS_TOKEN_SECRET = CONFIG['twitter_access_token_secret']
+AI_MODEL_LITE = CONFIG["ai_model_lite"]
+AI_MODEL = CONFIG["ai_model_full"]
+AI_MODEL2 = CONFIG["ai_model2"]
+GOOGLE_API_KEY = CONFIG["google_api_key"]
+IMAGE_AI_MODEL = CONFIG["image_ai_model"]
+FB_PAGE_ID = CONFIG["fb_page_id"]
+FB_ACCESS_TOKEN = CONFIG["fb_access_token"]
+INSTAGRAM_APP_ID = CONFIG["instagram_app_id"]
+INSTAGRAM_ACCOUNT_ID = CONFIG["instagram_account_id"]
+INSTAGRAM_ACCESS_TOKEN = CONFIG["instagram_access_token"]
+IMGBB_API_KEY = CONFIG["imgbb_api_key"]
+IMAGEKIT_PUBLIC_KEY = CONFIG["imagekit_public_key"]
+IMAGEKIT_PRIVATE_KEY = CONFIG["imagekit_private_key"]
+IMAGEKIT_URL_ENDPOINT = CONFIG["imagekit_url_endpoint"]
+BSKY_HANDLE = CONFIG["bsky_handle"]
+BSKY_PASSWORD = CONFIG["bsky_password"]
+TWITTER_API_KEY = CONFIG["twitter_api_key"]
+TWITTER_API_KEY_SECRET = CONFIG["twitter_api_key_secret"]
+TWITTER_BEARER_TOKEN = CONFIG["twitter_bearer_token"]
+TWITTER_ACCESS_TOKEN = CONFIG["twitter_access_token"]
+TWITTER_ACCESS_TOKEN_SECRET = CONFIG["twitter_access_token_secret"]
+
+
 def save_config(config_data):
     """Save configuration to JSON file"""
     try:
@@ -103,10 +107,10 @@ def save_config(config_data):
         config_dir = os.path.dirname(CONFIG_FILE)
         os.makedirs(config_dir, exist_ok=True)
 
-        with open(CONFIG_FILE, 'w') as f:
+        with open(CONFIG_FILE, "w", encoding="utf-8") as f:
             json.dump(config_data, f, indent=4)
         return True
-    except Exception as e:
+    except (OSError, IOError, json.JSONEncodeError) as e:
         print(f"Error saving config: {e}")
         return False
 
@@ -114,12 +118,13 @@ def save_config(config_data):
 # App Templates - Loaded from JSON files in /input directory
 APP_TEMPLATES = {}
 
-input_dir = os.path.join(os.path.dirname(__file__), '..', 'input')
+input_dir = os.path.join(os.path.dirname(__file__), "..", "input")
+
 
 def load_app_templates():
     """Load app templates from input directory with error handling."""
     templates = {}
-    
+
     # Create input directory if it doesn't exist
     if not os.path.exists(input_dir):
         try:
@@ -128,59 +133,63 @@ def load_app_templates():
         except OSError as e:
             print(f"Warning: Could not create input directory {input_dir}: {e}")
             return templates
-    
+
     # Load templates from JSON files
     try:
         if not os.path.isdir(input_dir):
             print(f"Warning: Input path {input_dir} is not a directory")
             return templates
-            
+
         files = os.listdir(input_dir)
-        json_files = [f for f in files if f.endswith('.json')]
-        
+        json_files = [f for f in files if f.endswith(".json")]
+
         if not json_files:
             print(f"Warning: No JSON files found in {input_dir}")
             # Create a sample app template to get users started
             sample_app = {
                 "name": "Sample App",
-                "description": "A sample Android app for demonstration purposes. Replace this with your actual app details.",
+                "description": "A sample Android app for demonstration purposes. "
+                "Replace this with your actual app details.",
                 "category": "Tools",
                 "key_features": [
                     "Easy to use interface",
                     "Fast and reliable",
-                    "Regular updates"
+                    "Regular updates",
                 ],
-                "game_guide": "This is a sample app. Please edit this template with your actual app information through the web interface.",
+                "game_guide": "This is a sample app. Please edit this template with "
+                "your actual app information through the web interface.",
                 "target_audience": "General users looking for useful tools",
-                "app_url": "https://play.google.com/store/apps/details?id=com.example.sampleapp"
+                "app_url": "https://play.google.com/store/apps/details?id="
+                "com.example.sampleapp",
             }
-            
+
             try:
-                sample_file = os.path.join(input_dir, 'sample_app.json')
-                with open(sample_file, 'w') as f:
+                sample_file = os.path.join(input_dir, "sample_app.json")
+                with open(sample_file, "w", encoding="utf-8") as f:
                     json.dump(sample_app, f, indent=4)
-                templates['sample_app'] = sample_app
+                templates["sample_app"] = sample_app
                 print(f"Created sample app template: {sample_file}")
             except IOError as e:
                 print(f"Warning: Could not create sample app template: {e}")
-            
+
             return templates
-            
+
         for filename in json_files:
             try:
                 key = filename[:-5]  # remove .json
                 file_path = os.path.join(input_dir, filename)
-                with open(file_path, 'r') as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     templates[key] = json.load(f)
                 print(f"Loaded app template: {key}")
             except (json.JSONDecodeError, IOError) as e:
                 print(f"Warning: Could not load {filename}: {e}")
                 continue
-                
+
     except OSError as e:
         print(f"Warning: Could not access input directory {input_dir}: {e}")
-    
+
     return templates
+
 
 # Load app templates at startup
 APP_TEMPLATES = load_app_templates()
@@ -195,8 +204,8 @@ PLATFORM_SETTINGS = {
         "best_practices": [
             "Use short paragraphs and emojis to boost engagement.",
             "Images with people perform better than generic graphics.",
-            "Aim for community-focused messaging."
-        ]
+            "Aim for community-focused messaging.",
+        ],
     },
     "instagram": {
         "max_chars": 2200,
@@ -208,8 +217,8 @@ PLATFORM_SETTINGS = {
         "best_practices": [
             "Use carousels for higher engagement.",
             "Leverage Stories/Reels for reach.",
-            "Keep captions short; let visuals do the talking."
-        ]
+            "Keep captions short; let visuals do the talking.",
+        ],
     },
     "twitter": {
         "max_chars": 280,
@@ -221,8 +230,8 @@ PLATFORM_SETTINGS = {
         "best_practices": [
             "Keep text short and impactful.",
             "Use 1–2 hashtags max for relevance.",
-            "Threads work well for storytelling."
-        ]
+            "Threads work well for storytelling.",
+        ],
     },
     "linkedin": {
         "disabled": True,
@@ -235,8 +244,8 @@ PLATFORM_SETTINGS = {
         "best_practices": [
             "Use professional and educational tone.",
             "Include data-driven insights or case studies.",
-            "Native documents and carousels drive more reach."
-        ]
+            "Native documents and carousels drive more reach.",
+        ],
     },
     "tiktok": {
         "disabled": True,
@@ -249,8 +258,8 @@ PLATFORM_SETTINGS = {
         "best_practices": [
             "Hook viewers in first 3 seconds.",
             "Use trending sounds and effects.",
-            "Keep videos between 10–30 seconds."
-        ]
+            "Keep videos between 10–30 seconds.",
+        ],
     },
     "bluesky": {
         "max_chars": 200,
@@ -264,9 +273,9 @@ PLATFORM_SETTINGS = {
             "Keep text under 300 chars — short and conversational.",
             "Avoid heavy hashtag use; plain words are preferred.",
             "Images must be < 976 KB.",
-            "Replying and engaging boosts visibility."
-        ]
-    }
+            "Replying and engaging boosts visibility.",
+        ],
+    },
 }
 
 
@@ -283,5 +292,5 @@ IMAGE_SETTINGS = {
     "accent_color": "#ffc107",
     "cta_color": "#4caf50",
     "default_font_size_title": 48,
-    "default_font_size_body": 32
+    "default_font_size_body": 32,
 }

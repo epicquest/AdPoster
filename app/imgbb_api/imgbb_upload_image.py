@@ -1,7 +1,7 @@
-import os
 import requests
 
 from ..config import IMGBB_API_KEY
+
 
 def upload_to_imgbb(image_path) -> str:
     with open(image_path, "rb") as file:
@@ -15,6 +15,3 @@ def upload_to_imgbb(image_path) -> str:
         response = requests.post(url, data=payload, files=files)
         response.raise_for_status()
         return response.json()["data"]["url"]
-
-
-

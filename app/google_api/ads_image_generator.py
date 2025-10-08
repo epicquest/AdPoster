@@ -1,11 +1,13 @@
+import io
 from datetime import datetime
 from pathlib import Path
-import io
-from PIL import Image
+
 import google.genai as genai
 from google.genai import types
+from PIL import Image
 
 from ..config import PLATFORM_SETTINGS
+
 
 class AdImageGenerator:
     def __init__(self, api_key: str):

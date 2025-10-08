@@ -1,0 +1,8 @@
+pytest
+ruff
+black
+isort
+flake8
+pylint
+mypy
+pip-tools

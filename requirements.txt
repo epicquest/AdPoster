@@ -29,9 +29,6 @@ tweepy>=4.14.0
 atproto>=0.0.33
 imagekitio>=3.0.0
 
-# Reddit API
-praw>=7.6.0
-
 # Utilities
 grapheme>=0.6.0
 MarkupSafe==3.0.2
