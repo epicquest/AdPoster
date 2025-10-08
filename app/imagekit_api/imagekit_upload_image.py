@@ -1,7 +1,8 @@
 from imagekitio.client import ImageKit
 from imagekitio.models.UploadFileRequestOptions import UploadFileRequestOptions
 
-from ..config import IMAGEKIT_PRIVATE_KEY, IMAGEKIT_PUBLIC_KEY, IMAGEKIT_URL_ENDPOINT
+from ..config import (IMAGEKIT_PRIVATE_KEY, IMAGEKIT_PUBLIC_KEY,
+                      IMAGEKIT_URL_ENDPOINT)
 
 
 class ImageKitUploader:

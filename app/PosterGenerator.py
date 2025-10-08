@@ -13,7 +13,8 @@ from typing import Dict, List, Optional
 
 from google import genai
 
-from .config import APP_TEMPLATES, GOOGLE_API_KEY, IMAGE_AI_MODEL, PLATFORM_SETTINGS
+from .config import (APP_TEMPLATES, GOOGLE_API_KEY, IMAGE_AI_MODEL,
+                     PLATFORM_SETTINGS)
 from .google_api.ads_image_generator import AdImageGenerator
 
 

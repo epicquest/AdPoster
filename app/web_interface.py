@@ -3,17 +3,8 @@ import logging
 import os
 from datetime import datetime
 
-from flask import (
-    Flask,
-    flash,
-    jsonify,
-    make_response,
-    redirect,
-    render_template,
-    request,
-    send_from_directory,
-    url_for,
-)
+from flask import (Flask, flash, jsonify, make_response, redirect,
+                   render_template, request, send_from_directory, url_for)
 
 from .AdPoster import AdPoster
 from .config import APP_TEMPLATES, CONFIG, PLATFORM_SETTINGS, save_config
