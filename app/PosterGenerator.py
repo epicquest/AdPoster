@@ -94,7 +94,7 @@ class PosterGenerator:
         )
         self.logger = logging.getLogger(__name__)
 
-    def create_prompt_first(self, app_info: AppInfo, platform: str) -> str:
+    def create_prompt_first(self, _app_info: AppInfo, platform: str) -> str:
         """Create a detailed prompt for Gemini based on app info and platform"""
         config = self.platform_configs.get(platform, {})
         _ = config.get("max_chars", 2200)
@@ -162,7 +162,7 @@ class PosterGenerator:
         """Generate ad content using Gemini AI"""
         try:
             prompt = self.create_prompt(app_info, platform)
-            self.logger.info(f"Generating ad content for {platform}")
+            self.logger.info("Generating ad content for %s", platform)
 
             # Access API methods through services on the client object
             response = self.client.models.generate_content(
@@ -206,8 +206,10 @@ class PosterGenerator:
                     app_url=app_info.app_url,
                 )
 
-                self.logger.info(f"Successfully generated ad content for {platform}")
+                self.logger.info("Successfully generated ad content for %s", platform)
                 return ad_content
+            self.logger.error("Failed to parse content for %s", platform)
+            return None
 
         except (ValueError, TypeError, KeyError, ConnectionError, TimeoutError) as e:
             self.logger.error("Error generating ad content for %s: %s", platform, str(e))
@@ -229,7 +231,7 @@ class PosterGenerator:
                         )
                     ads[platform] = ad_content
             else:
-                self.logger.warning(f"Platform {platform} not supported")
+                self.logger.warning("Platform %s not supported", platform)
 
         return ads
 
@@ -259,7 +261,7 @@ class PosterGenerator:
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(ads_data, f, indent=2, ensure_ascii=False)
 
-        self.logger.info(f"Ads saved to {filepath}")
+        self.logger.info("Ads saved to %s", filepath)
         return filepath
 
     def print_ad_preview(self, ad_content: AdContent):
@@ -298,6 +300,7 @@ class PosterGenerator:
 
         except (ValueError, TypeError, IOError, ConnectionError, TimeoutError) as e:
             print(f"An error occurred: {e}")
+            return None
 
 
 # Example usage
@@ -328,7 +331,7 @@ def main():
     )
 
     # Display previews
-    for platform, ad_content in ads.items():
+    for ad_content in ads.values():
         poster_generator.print_ad_preview(ad_content)
 
     # Save to file

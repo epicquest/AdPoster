@@ -1,3 +1,10 @@
+"""
+Web interface module for the AdPoster application.
+
+This module provides a Flask-based web interface for managing and generating
+advertisements across multiple social media platforms.
+"""
+
 import json
 import logging
 import os

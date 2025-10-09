@@ -110,7 +110,7 @@ def save_config(config_data):
         with open(CONFIG_FILE, "w", encoding="utf-8") as f:
             json.dump(config_data, f, indent=4)
         return True
-    except (OSError, IOError, json.JSONEncodeError) as e:
+    except (OSError, IOError, ValueError) as e:
         print(f"Error saving config: {e}")
         return False
 
