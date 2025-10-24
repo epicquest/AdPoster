@@ -35,7 +35,7 @@ class FacebookPoster:
         logger.info(
             "FacebookPoster initialized with page_id: %s, access_token: %s",
             bool(self.page_id),
-            bool(self.access_token)
+            bool(self.access_token),
         )
 
     def post_image_and_comment(
@@ -57,7 +57,7 @@ class FacebookPoster:
         logger.info(
             "Starting Facebook post with image: %s, message length: %s",
             image_path,
-            len(message) if message else 0
+            len(message) if message else 0,
         )
 
         if not self.page_id or not self.access_token:
@@ -99,7 +99,7 @@ class FacebookPoster:
         logger.info(
             "Creating Facebook post - Has image: %s, Message length: %s",
             bool(image_path),
-            len(message) if message else 0
+            len(message) if message else 0,
         )
 
         try:
@@ -113,8 +113,7 @@ class FacebookPoster:
                 post_response = requests.post(post_url, json=post_payload, timeout=30)
 
                 logger.info(
-                    "Facebook text post response status: %s",
-                    post_response.status_code
+                    "Facebook text post response status: %s", post_response.status_code
                 )
                 post_response.raise_for_status()
 
@@ -149,11 +148,10 @@ class FacebookPoster:
 
                     logger.info(
                         "Facebook image upload response status: %s",
-                        response.status_code
+                        response.status_code,
                     )
                     logger.debug(
-                        "Facebook upload response headers: %s",
-                        dict(response.headers)
+                        "Facebook upload response headers: %s", dict(response.headers)
                     )
 
                     response.raise_for_status()
@@ -174,8 +172,7 @@ class FacebookPoster:
                 post_response = requests.post(post_url, json=post_payload, timeout=30)
 
                 logger.info(
-                    "Facebook post response status: %s",
-                    post_response.status_code
+                    "Facebook post response status: %s", post_response.status_code
                 )
                 post_response.raise_for_status()
 
@@ -214,7 +211,7 @@ class FacebookPoster:
         logger.info(
             "Adding comment to Facebook post %s, comment length: %s",
             post_id,
-            len(comment_message)
+            len(comment_message),
         )
 
         try:
@@ -230,8 +227,7 @@ class FacebookPoster:
             )
 
             logger.info(
-                "Facebook comment response status: %s",
-                comment_response.status_code
+                "Facebook comment response status: %s", comment_response.status_code
             )
             comment_response.raise_for_status()
 

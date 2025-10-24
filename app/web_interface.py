@@ -10,8 +10,17 @@ import logging
 import os
 from datetime import datetime
 
-from flask import (Flask, flash, jsonify, make_response, redirect,
-                   render_template, request, send_from_directory, url_for)
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    make_response,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
 
 from .AdPoster import AdPoster
 from .config import APP_TEMPLATES, CONFIG, PLATFORM_SETTINGS, save_config
@@ -68,11 +77,15 @@ def get_images_for_ad(ad_file):
                     if os.path.exists(full_image_path):
                         images.append(image_filename)
                         platform_images[platform] = True
-                        logging.debug("Found image for %s: %s", platform, image_filename)
+                        logging.debug(
+                            "Found image for %s: %s", platform, image_filename
+                        )
                     else:
                         logging.debug(
                             "Image not found for %s: %s (path: %s)",
-                            platform, image_filename, full_image_path
+                            platform,
+                            image_filename,
+                            full_image_path,
                         )
 
     except (IOError, OSError, json.JSONDecodeError, ValueError) as e:
@@ -399,7 +412,8 @@ def generate_ad():
 
         logging.info(
             "Starting ad generation for %s on platforms: %s",
-            selected_app_name, selected_platforms
+            selected_app_name,
+            selected_platforms,
         )
 
         # Generate ads
@@ -451,7 +465,14 @@ def generate_ad():
             }
         )
 
-    except (ValueError, TypeError, KeyError, ConnectionError, TimeoutError, json.JSONDecodeError) as e:
+    except (
+        ValueError,
+        TypeError,
+        KeyError,
+        ConnectionError,
+        TimeoutError,
+        json.JSONDecodeError,
+    ) as e:
         logging.error("Error generating ads: %s", str(e))
         return jsonify(
             {
@@ -537,7 +558,8 @@ def post_ad_to_platform(ad_file, platform):
             progress_steps.append("📝 Preparing ad content and validating data...")
             logging.info(
                 "Step 2: Preparing content - Body: %d chars, Image: %s",
-                len(body_text), 'Yes' if image_path else 'No'
+                len(body_text),
+                "Yes" if image_path else "No",
             )
 
             # Step 3: Platform-specific preparation
@@ -568,14 +590,25 @@ def post_ad_to_platform(ad_file, platform):
             logging.info("Step 5: Calling post_ad method for %s", platform)
             logging.debug(
                 "Posting parameters: platform=%s, image_path=%s, body_text_length=%d, app_url=%s",
-                platform, image_path, len(body_text), app_url
+                platform,
+                image_path,
+                len(body_text),
+                app_url,
             )
 
             # Call the post_ad method with detailed error tracking
             try:
                 poster.post_ad(platform, image_path, body_text, app_url)
                 logging.info("post_ad method completed successfully for %s", platform)
-            except (ValueError, TypeError, KeyError, ConnectionError, TimeoutError, IOError, OSError) as post_ad_error:
+            except (
+                ValueError,
+                TypeError,
+                KeyError,
+                ConnectionError,
+                TimeoutError,
+                IOError,
+                OSError,
+            ) as post_ad_error:
                 error_details = {
                     "error_type": type(post_ad_error).__name__,
                     "error_message": str(post_ad_error),
@@ -608,7 +641,7 @@ def post_ad_to_platform(ad_file, platform):
                     {
                         "status": "error",
                         "message": f"Failed to post to {platform.title()}: "
-                                   f"{error_details['error_message']}",
+                        f"{error_details['error_message']}",
                         "error_type": error_details["error_type"],
                         "progress_steps": progress_steps,
                         "error_details": error_details,
@@ -626,13 +659,23 @@ def post_ad_to_platform(ad_file, platform):
             # Step 8: Final confirmation
             progress_steps.append(f"🎉 Successfully posted to {platform.title()}!")
 
-        except (ValueError, TypeError, KeyError, ConnectionError, TimeoutError, IOError, OSError) as post_error:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            ConnectionError,
+            TimeoutError,
+            IOError,
+            OSError,
+        ) as post_error:
             error_msg = str(post_error)
             error_type = type(post_error).__name__
             logging.error(
                 "Outer exception in post_ad_to_platform: %s - %s", error_type, error_msg
             )
-            progress_steps.append("❌ Unexpected error: %s - %s" % (error_type, error_msg))
+            progress_steps.append(
+                "❌ Unexpected error: %s - %s" % (error_type, error_msg)
+            )
 
             # Update ad data with error information
             current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -685,10 +728,21 @@ def post_ad_to_platform(ad_file, platform):
             }
         )
 
-    except (ValueError, TypeError, KeyError, ConnectionError, TimeoutError, IOError, OSError) as e:
+    except (
+        ValueError,
+        TypeError,
+        KeyError,
+        ConnectionError,
+        TimeoutError,
+        IOError,
+        OSError,
+    ) as e:
         logging.error("Error posting ad to %s: %s", platform, str(e))
         return jsonify(
-            {"status": "error", "message": "Failed to post to %s: %s" % (platform, str(e))}
+            {
+                "status": "error",
+                "message": "Failed to post to %s: %s" % (platform, str(e)),
+            }
         )
 
 
@@ -729,7 +783,6 @@ def add_app():
             json.dump(app_data, f, indent=2)
 
         # Reload APP_TEMPLATES
-        global APP_TEMPLATES
         APP_TEMPLATES[app_key] = app_data
 
         return redirect(url_for("list_apps"))
@@ -757,7 +810,6 @@ def edit_app(app_key):
             json.dump(app_data, f, indent=2)
 
         # Reload APP_TEMPLATES
-        global APP_TEMPLATES
         APP_TEMPLATES[app_key] = app_data
 
         return redirect(url_for("list_apps"))
@@ -777,7 +829,6 @@ def delete_app(app_key):
         os.remove(json_path)
 
     # Remove from APP_TEMPLATES
-    global APP_TEMPLATES
     if app_key in APP_TEMPLATES:
         del APP_TEMPLATES[app_key]
 

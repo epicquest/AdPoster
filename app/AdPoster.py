@@ -5,8 +5,8 @@ This module contains the core AdPoster class that orchestrates advertisement
 posting across multiple social media platforms.
 """
 
-import os
 import logging
+import os
 
 from .blue_sky_api.blue_sky_poster import BlueskyPoster
 from .config import APP_TEMPLATES, GOOGLE_API_KEY
@@ -30,7 +30,7 @@ class AdPoster:
             "Parameters: image_path=%s, body_text_length=%s, app_url=%s",
             image_path,
             len(body_text) if body_text else 0,
-            app_url
+            app_url,
         )
 
         try:
@@ -39,7 +39,7 @@ class AdPoster:
                 poster = FacebookPoster()
                 logging.info(
                     "Calling FacebookPoster.post_image_and_comment() with image: %s",
-                    image_path
+                    image_path,
                 )
                 result = poster.post_image_and_comment(
                     image_path, body_text, app_url=app_url
@@ -51,7 +51,7 @@ class AdPoster:
                 poster = TwitterPoster()
                 logging.info(
                     "Calling TwitterPoster.post_text_and_link() with text: %s...",
-                    body_text[:50]
+                    body_text[:50],
                 )
                 result = poster.post_text_and_link(body_text, app_url)
                 logging.info("Twitter posting result: %s", result)
@@ -60,8 +60,7 @@ class AdPoster:
                 logging.info("Initializing BlueskyPoster...")
                 poster = BlueskyPoster()
                 logging.info(
-                    "Calling BlueskyPoster.post_image() with image: %s",
-                    image_path
+                    "Calling BlueskyPoster.post_image() with image: %s", image_path
                 )
                 result = poster.post_image(image_path, body_text, app_url)
                 logging.info("BlueSky posting result: %s", result)
@@ -78,8 +77,7 @@ class AdPoster:
 
                 if uploaded_url:
                     logging.info(
-                        "Image uploaded successfully to ImageKit. URL: %s",
-                        uploaded_url
+                        "Image uploaded successfully to ImageKit. URL: %s", uploaded_url
                     )
                     result = poster.post_image(uploaded_url, body_text)
                     logging.info("Instagram posting result: %s", result)

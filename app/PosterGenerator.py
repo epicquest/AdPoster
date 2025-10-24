@@ -13,8 +13,7 @@ from typing import Dict, List, Optional
 
 from google import genai
 
-from .config import (APP_TEMPLATES, GOOGLE_API_KEY, IMAGE_AI_MODEL,
-                     PLATFORM_SETTINGS)
+from .config import APP_TEMPLATES, GOOGLE_API_KEY, IMAGE_AI_MODEL, PLATFORM_SETTINGS
 from .google_api.ads_image_generator import AdImageGenerator
 
 
@@ -212,7 +211,9 @@ class PosterGenerator:
             return None
 
         except (ValueError, TypeError, KeyError, ConnectionError, TimeoutError) as e:
-            self.logger.error("Error generating ad content for %s: %s", platform, str(e))
+            self.logger.error(
+                "Error generating ad content for %s: %s", platform, str(e)
+            )
             return None
 
     def generate_multiple_ads(

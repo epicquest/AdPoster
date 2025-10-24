@@ -4,8 +4,12 @@ from typing import Optional
 
 import tweepy
 
-from ..config import (TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET,
-                      TWITTER_API_KEY, TWITTER_API_KEY_SECRET)
+from ..config import (
+    TWITTER_ACCESS_TOKEN,
+    TWITTER_ACCESS_TOKEN_SECRET,
+    TWITTER_API_KEY,
+    TWITTER_API_KEY_SECRET,
+)
 
 # Configure logging for TwitterPoster
 logger = logging.getLogger(__name__)
