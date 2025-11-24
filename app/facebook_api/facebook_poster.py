@@ -8,6 +8,7 @@ import logging
 import os
 
 import requests
+from PIL import Image
 
 from ..config import FB_ACCESS_TOKEN, FB_PAGE_ID
 
@@ -106,7 +107,7 @@ class FacebookPoster:
             if image_path is None or not os.path.exists(image_path):
                 # No media file, post just the text
                 logger.info("Posting text-only content to Facebook")
-                post_url = f"https://graph.facebook.com/v23.0/{self.page_id}/feed"
+                post_url = f"https://graph.facebook.com/v22.0/{self.page_id}/feed"
                 post_payload = {"access_token": self.access_token, "message": message}
 
                 logger.info("Making text post request to: %s", post_url)
@@ -122,12 +123,34 @@ class FacebookPoster:
                 logger.info("Text post created successfully. Post ID: %s", post_id)
 
             else:
-                # Step 1: Upload the image and get its ID
-                logger.info("Uploading image to Facebook: %s", image_path)
+                # Step 1: Validate and upload the image
+                logger.info("Validating image: %s", image_path)
 
-                # Check file size
+                # Check if file exists and is readable
+                if not os.path.exists(image_path):
+                    error_msg = f"Image file does not exist: {image_path}"
+                    logger.error(error_msg)
+                    raise RuntimeError(error_msg)
+
+                # Check file size (Facebook limit is 10MB)
                 file_size = os.path.getsize(image_path)
-                logger.info("Image file size: %s bytes", file_size)
+                max_size = 10 * 1024 * 1024  # 10MB
+                if file_size > max_size:
+                    error_msg = f"Image file too large: {file_size} bytes (max {max_size})"
+                    logger.error(error_msg)
+                    raise RuntimeError(error_msg)
+
+                # Validate image format
+                try:
+                    with Image.open(image_path) as img:
+                        img.verify()  # Verify the image is not corrupted
+                    logger.info("Image validation passed")
+                except Exception as e:
+                    error_msg = f"Invalid image file: {str(e)}"
+                    logger.error(error_msg)
+                    raise RuntimeError(error_msg)
+
+                logger.info("Uploading image to Facebook: %s", image_path)
 
                 with open(image_path, "rb") as img:
                     files = {
@@ -138,7 +161,7 @@ class FacebookPoster:
                         "published": "false",
                     }
                     upload_url = (
-                        f"https://graph.facebook.com/v23.0/{self.page_id}/photos"
+                        f"https://graph.facebook.com/v22.0/{self.page_id}/photos"
                     )
 
                     logger.info("Uploading image to: %s", upload_url)
@@ -161,7 +184,7 @@ class FacebookPoster:
 
                 # Step 2: Create the main post with the uploaded image
                 logger.info("Creating main Facebook post with uploaded image...")
-                post_url = f"https://graph.facebook.com/v23.0/{self.page_id}/feed"
+                post_url = f"https://graph.facebook.com/v22.0/{self.page_id}/feed"
                 post_payload = {
                     "access_token": self.access_token,
                     "message": message,
@@ -191,10 +214,18 @@ class FacebookPoster:
             logger.error(error_msg)
             raise RuntimeError(error_msg) from exc
         except requests.exceptions.HTTPError as exc:
+            # Determine which response to use
+            if 'post_response' in locals():
+                resp = post_response
+            elif 'response' in locals():
+                resp = response
+            else:
+                resp = exc.response if hasattr(exc, 'response') else None
+            
             error_msg = (
                 f"Facebook HTTP error: "
-                f"{post_response.status_code if 'post_response' in locals() else 'Unknown'} "
-                f"- {post_response.text if 'post_response' in locals() else str(exc)}"
+                f"{resp.status_code if resp else 'Unknown'} "
+                f"- {resp.text if resp else str(exc)}"
             )
             logger.error(error_msg)
             raise RuntimeError(error_msg) from exc
@@ -215,7 +246,7 @@ class FacebookPoster:
         )
 
         try:
-            comment_url = f"https://graph.facebook.com/v23.0/{post_id}/comments"
+            comment_url = f"https://graph.facebook.com/v22.0/{post_id}/comments"
             comment_payload = {
                 "access_token": self.access_token,
                 "message": comment_message,

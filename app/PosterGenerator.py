@@ -13,7 +13,7 @@ from typing import Dict, List, Optional
 
 from google import genai
 
-from .config import APP_TEMPLATES, GOOGLE_API_KEY, IMAGE_AI_MODEL, PLATFORM_SETTINGS
+from .config import APP_TEMPLATES, GOOGLE_API_KEY, IMAGE_AI_MODEL, IMAGEN_MODEL, PLATFORM_SETTINGS
 from .google_api.ads_image_generator import AdImageGenerator
 
 
@@ -79,6 +79,7 @@ class PosterGenerator:
 
         self.client = genai.Client(api_key=self.gemini_api_key)
         self.image_ai_model = IMAGE_AI_MODEL
+        self.imagen_model = IMAGEN_MODEL
         self.logger = logging.getLogger(__name__)
 
     def setup_logging(self):
@@ -293,7 +294,7 @@ class PosterGenerator:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"ads_{platform}_{timestamp}.png"
             # filepath = self.output_dir / filename
-            ad_image_generator = AdImageGenerator(self.gemini_api_key)
+            ad_image_generator = AdImageGenerator(self.gemini_api_key, self.imagen_model)
             image_path = ad_image_generator.generate_image_from_text(
                 platform, prompt, self.output_dir, filename
             )

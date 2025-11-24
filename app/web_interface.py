@@ -881,6 +881,7 @@ def save_configuration():
         "ai_model2": request.form.get("ai_model2", "gemini-2.5-flash-preview-04-17"),
         "google_api_key": request.form.get("google_api_key", ""),
         "image_ai_model": request.form.get("image_ai_model", "gemini-2.0-flash"),
+        "imagen_model": request.form.get("imagen_model", "imagen-4.0-generate-001"),
         "fb_page_id": request.form.get("fb_page_id", ""),
         "fb_access_token": request.form.get("fb_access_token", ""),
         "instagram_app_id": request.form.get("instagram_app_id", ""),

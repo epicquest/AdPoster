@@ -10,8 +10,9 @@ from ..config import PLATFORM_SETTINGS
 
 
 class AdImageGenerator:
-    def __init__(self, api_key: str):
+    def __init__(self, api_key: str, model: str = "imagen-4.0-generate-001"):
         self.gemini_api_key = api_key
+        self.model = model
         self.client = genai.Client(api_key=self.gemini_api_key)
 
     def _compress_image(self, img: Image.Image, max_size_kb: int, filepath: Path):
@@ -74,7 +75,7 @@ class AdImageGenerator:
 
             # Generate image with Gemini
             response = self.client.models.generate_images(
-                model="imagen-3.0-generate-002",
+                model=self.model,
                 prompt=refined_prompt,
                 config=types.GenerateImagesConfig(
                     number_of_images=1,

@@ -51,6 +51,7 @@ def load_config():
     config.setdefault("ai_model2", "gemini-2.5-flash-preview-04-17")
     config.setdefault("google_api_key", "")
     config.setdefault("image_ai_model", "gemini-2.0-flash")
+    config.setdefault("imagen_model", "imagen-4.0-generate-001")
     config.setdefault("fb_page_id", "")
     config.setdefault("fb_access_token", "")
     config.setdefault("instagram_app_id", "")
@@ -82,6 +83,7 @@ AI_MODEL = CONFIG["ai_model_full"]
 AI_MODEL2 = CONFIG["ai_model2"]
 GOOGLE_API_KEY = CONFIG["google_api_key"]
 IMAGE_AI_MODEL = CONFIG["image_ai_model"]
+IMAGEN_MODEL = CONFIG["imagen_model"]
 FB_PAGE_ID = CONFIG["fb_page_id"]
 FB_ACCESS_TOKEN = CONFIG["fb_access_token"]
 INSTAGRAM_APP_ID = CONFIG["instagram_app_id"]

@@ -1,6 +1,8 @@
 import logging
+import os
 
 import requests
+from PIL import Image
 
 from ..config import INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_ACCOUNT_ID
 
@@ -98,22 +100,8 @@ class InstagramPoster:
             error_msg = f"Instagram connection error: {str(e)}"
             logger.error(error_msg)
             raise Exception(error_msg)
-        except requests.exceptions.HTTPError:
-            response_text = ""
-            if "response" in locals():
-                response_text = response.text
-            elif "publish_response" in locals():
-                response_text = publish_response.text
-            status_code = (
-                response.status_code
-                if "response" in locals()
-                else (
-                    publish_response.status_code
-                    if "publish_response" in locals()
-                    else "Unknown"
-                )
-            )
-            error_msg = f"Instagram HTTP error: {status_code} - {response_text}"
+        except requests.exceptions.HTTPError as e:
+            error_msg = f"Instagram HTTP error: {e}"
             logger.error(error_msg)
             raise Exception(error_msg)
         except Exception as e:
